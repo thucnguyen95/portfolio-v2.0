@@ -1,0 +1,53 @@
+[h2]Assignment Details[/h2]
+[p]The first part of a two-part assignment which will use HTML5, CSS, and Javascript to build the application. The purpose of the assignment is to let users sign up for a fictitious marathon. The information for the run is all fictional, but users must be able to fill out a form, submit the information, receive a confirmation, and the roster of runners should be available for viewing. The second part of the assignment uses PHP, AJAX, and MySQL to allow user information to be processed on the server and stored in the database. There will be two levels of validation - the first on the client side using javascript and the second on the server side.[/p]
+[br]
+[p]The project must contain the following:[/p]
+
+[p]- A landing HTML5 page which provides specific details about the marathon and contains links for the user to sign up for the marathon and for the user to view the roster.[/p]
+[p]- A signup page which is a form with the following fields:[/p]
+[list]
+[*]Runner's Image[/*]
+[*]First, Middle, and Last Name[/*]
+[*]Address, City, State, and Zip Code (2 lines total)[/*]
+[*]Primary Phone Number[/*]
+[*]Email Address[/*]
+[*]Gender[/*]
+[*]Date of Birth[/*]
+[*]Medical Conditions (use textarea element)[/*]
+[*]Experience Level (Expert, Experienced, Novice)[/*]
+[*]Category (Teen, Adult, Senior)[/*]
+[/list]
+[br]
+
+[h2]Project Details[/h2]
+[br]
+[h4]CSS[/h4]
+[p]The layout of the landing page was simple and straightforward, with the information about the race divided into subsections, color-coded by background color. The menu was made using a flexbox. To dim the brightness of the header image, a container was laid above it with a dark background color that was slightly transparent.[/p]
+[br]
+
+[img]/projectdetailimages/cs545_project2_homepreview.gif[/img]
+
+[br]
+[p]The form was also laid out using flexboxes.[/p]
+[br]
+
+[img]/projectdetailimages/cs545_project2_formpreview.gif[/img]
+
+[br]
+
+[h4]Validation (Javascript)[/h4]
+[p]Applicable files: [color=#00796B]registration_jquery.js[/color][/p]
+[br]
+[p]The on click event handler was attached to the submit button, which called a function that checked if all the input fields in the form was valid. If at least one field was invalid, the form would be prevented from submitting. The form elements that did not validate were indicated by a red border, and a brief description of what went wrong was set to visible. Clicking the reset input would clear the data in the form along with the red borders and error descriptions. The most recent error was also indicated by giving focus to that input box.[/p]
+[br]
+
+[img]/projectdetailimages/cs545_project2_formerrorpreview.gif[/img]
+
+[br]
+[p]The first and last names were validated by checking for no input or an empty field, done by trimming the input data. The middle name was not validated because it can be optional.[/p]
+[br]
+[p]All of the fields for the address were checked for empty input by trimming, and the select element (dropdown) was checked against null. Furthermore, a regular expression of a 5-digit number was used for the zip code and tested against using the test() method. This method of validation in which input was trimmed and checked against a regex was done for the phone number, email, and date of birth as well.[/p]
+[br]
+[p]However, what was interesting was the way in which the date of birth was valdiated. In order to check that the date provided by the user was a real date, the input arguments were passed to the Date parameters when instantiating a new Date object. The Date library would then create a new object in which the date was potentially shifted because the parameters provided were incorrect. The month, day, and year of this new object was checked for equality against the user's inputs.[/p]
+[br]
+[p]The gender, experience, and age category were all radio buttons, and were validated by checking if at least one of the radio buttons were actually checked.[/p]

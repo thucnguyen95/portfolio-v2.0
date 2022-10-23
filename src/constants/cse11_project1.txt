@@ -1,0 +1,262 @@
+[h2]Assignment[/h2]
+[p]You are to create a program called [i]FourDice.java[/i]. You will use a single random number generator instance from [i]java.util.Random[/i] to generate four different random numbers. The program first reads (from [i]System.in[/i] which is also called “standard input” or often [i]stdin[/i]) a single integer. This input might be used as a numeric seed for a single random number generator instance (see below).[/p]
+[list]
+    [*]Your program uses the generator to create four different random integers in the range [1,6] (closed range, includes the endpoints 1 and 6).[/*]
+    [*]It prints out the four numbers generated (the numbers are like rolls of dice).[/*]
+    [*]It finds the Minimum and Maximum numbers generated, and prints them out.[/*]
+    [*]If all four numbers are identical, it prints out “Go to Vegas!”[/*]
+    [*]If exactly three of the four numbers are identical, it prints out “Three of a kind.”[/*]
+    [*]If it is neither of the above, it prints out “Not so lucky.”[/*]
+[/list]
+[br]
+
+[p][b]See the example output for the precise format that your program should generate. Your program MUST follow this format for the auto-grader to work properly. Spaces are important, as is spelling and punctuation.[/b][/p]
+[br]
+
+[p]Here are a few runs of the program. [b]Boldface[/b] indicates input by the user. [i][PR1]$[/i] is the command-line prompt. Notice that running with seed == -10 gives different answers each time the code is run. That is correct.[/p]
+[br]
+
+<pre>
+    [PR1]$ [b]java FourDice[/b]
+    [b]10[/b]
+    Seed : 10
+    Roll 1 : 4
+    Roll 2 : 1
+    Roll 3 : 4
+    Roll 4 : 1
+    Smallest Roll : 1
+    Largest Roll : 4
+    Not so lucky.
+
+    [PR1]$ [b]java FourDice[/b]
+    [b]13[/b]
+    Seed : 13
+    Roll 1 : 5
+    Roll 2 : 5
+    Roll 3 : 6
+    Roll 4 : 5
+    Smallest Roll : 5
+    Largest Roll : 6
+    Three of a kind.
+
+    [PR1]$ [b]java FourDice[/b]
+    [b]55[/b]
+    Seed : 55
+    Roll 1 : 2
+    Roll 2 : 2
+    Roll 3 : 2
+    Roll 4 : 2
+    Smallest Roll : 2
+    Largest Roll : 2
+    Go to Vegas!
+
+    [PR1]$ [b]java FourDice[/b]
+    [b]-10[/b]
+    Seed : -10
+    Roll 1 : 4
+    Roll 2 : 6
+    Roll 3 : 5
+    Roll 4 : 3
+    Smallest Roll : 3
+    Largest Roll : 6
+    Not so lucky.
+
+    [PR1]$ [b]java FourDice[/b]
+    [b]-10[/b]
+    Seed : -10
+    Roll 1 : 1
+    Roll 2 : 1
+    Roll 3 : 1
+    Roll 4 : 1
+    Smallest Roll : 1
+    Largest Roll : 1
+    Go to Vegas!
+</pre>
+[br]
+
+[p][u]Key requirements of your program[/u][/p]
+[p](1) There is single integer read from standard input ([i]System.in[/i]), call this the seed.[/p]
+[br]
+
+[p](2) You generate exactly one instance of the [i]java.util.Random[/i] class[/p]
+[br]
+[list]
+    [*]If the seed is greater than 0, use the seed as the seed of your [i]java.util.Random[/i] instance.[/*]
+    [*]If the seed is less than or equal to 0, then you should not use the seed as the seed of your java.util.Random instance. You should not use any explicit seed in this case.[/*]
+[/list]
+[br]
+
+[p](3) Print out the seed, generated numbers, and output as above. Your program is partially autograded and following the format rules are essential for the autograder to work properly.[/p]
+[br]
+[list]
+    [*]Include a single space on either side of the “:” (colon) on each line of output.[/*]
+    [*]Include no extra output.[/*]
+    [*]Use [i]System.out.println[/i] for all lines of output[/*]
+[/list]
+[br]
+
+[p](4) Compute the smallest and largest rolls and print out exactly as above[/p]
+[br]
+[list]
+    [*]Feel free to use the [i]Math.min[/i] and [i]Math.max[/i] methods provided by [i]java.lang.Math[/i][/*]
+[/list]
+[br]
+
+[p](5) If all dice rolls were identical, print the phrase “Go to Vegas!”[/p]
+[br]
+
+[p](6) If exactly three of the four dice rolls are identical print the phrase “ Three of a kind.”[/p]
+[br]
+
+[p](7) If neither of the above are true, print the phrase “Not so lucky.”[/p]
+[br]
+
+[p](8) Random numbers (rolls) are in the range [1,6]. (closed interval, 1 and 6 are possible numbers)[/p]
+[br]
+
+[p](9) The class must be called FourDice and must be in the file FourDice.java[/p]
+[br]
+
+[p](10) [b]Do not add any extra lines[/b] of output. Your output should look just like the examples above.[/p]
+[br]
+
+[p](11) You must use constants in your program (variables declared as [i]final[/i]). Don’t use so-called “magic numbers” in your code. A magic number is a hard-coded value that may change at a later stage, and can therefore be more difficult to update. Instead define constants and use that constant in your program. Define constants maximum allowable random number. 0, 1, & 2 are generally not considered “magic” numbers in programs.[/p]
+[br]
+
+[p](12) You do NOT have to check if the input is actually an integer. We will test your program only with valid integer inputs that do not overflow Java’s [i]int[/i] datatype.[/p]
+[br]
+
+[p][u]Formatting/Commenting Requirements of your Program[/u][/p]
+[p](1) Your code must be properly indented. You may use spaces or tabs. Do NOT mix spaces and tabs for indentation. Choose one or the other and be consistent. (10 Points).[/p]
+[br]
+[p](2) You must put in comments of your program at the top of the file (10 Points)[/p]
+<pre>
+    Name : &lt;Your Full Name&gt;
+    Email : &lt;Your UCSD Email&gt;
+    ID : &lt;Your Student ID, e.g. A123456789&gt;
+</pre>
+[br]
+
+[p][u]Hints[u][/p]
+[p](1) A [i]return[/i] statement can be used to stop execution of your main method and prevent it from executing any further statements. This can be helpful in debugging[/p]
+[br]
+[p](2) Build your program in stages. You don’t have to write the entire program before you begin to debug. Write part of the program, test it, then add another part, test it, and so on.[/p]
+[br]
+[p](3) Generate only one instance of the Random class and use that instance to generate all four of the required random integers. If you create and use more than one instance of the Random class, then statistics for your program when run multiple times will be incorrect.[/p]
+[br]
+[p](4) Think a bit about how to determine if exactly three of four dice are identical. You have computed the minimum and maximum values rolled. Once you have computed these values, have your program count the number of rolls that are equal to this minimum value AND the number of rolls that are equal to the maximum value. What must be true if you have four of a kind? What must be true if you have exactly three-of-a-kind?[/p]
+[br]
+
+[h2]Implementation Details[/h2]
+[p]Within [color=#800000]main()[/color], an if statement was used to determine if the integer read in would be used as the seed or not. Then, a loop was used to have the number generator generate 4 integers and place them in an array. The method then calls private methods [color=#800000]sortArray()[/color], [color=#800000]printMaxAndMin()[/color], and [color=#800000]checkForSpecialCases()[/color].[/p]
+[br]
+
+<pre><code class="language-java">
+import java.util.Random;
+import java.util.Scanner;
+
+public class FourDice {
+    public static void main(String[] args) {
+        Scanner scnr = new Scanner(System.in);
+        int seed = scnr.nextInt();
+        System.out.println("Seed : " + seed);
+
+        final int NUM_RANDOM_INTEGERS = 4;  // number of iterations
+        final int NUM_GEN_RANGE = 6;    // number generator range
+
+        int[] generatedNumbers = new int[NUM_RANDOM_INTEGERS];
+        Random numGen = new Random();
+        if (seed > 0) {
+            numGen.setSeed(seed);
+        }
+        for (int i = 0; i < NUM_RANDOM_INTEGERS; ++i) {
+            int generatedNum = numGen.nextInt(NUM_GEN_RANGE) + 1;
+            generatedNumbers[i] = generatedNum;
+            System.out.println("Roll " + (i + 1) + " : " + generatedNum);
+        }
+        sortArray(generatedNumbers, NUM_RANDOM_INTEGERS);
+        printMaxAndMin(generatedNumbers, NUM_RANDOM_INTEGERS);
+        checkForSpecialCases(generatedNumbers, NUM_RANDOM_INTEGERS);
+    }
+}
+</code></pre>
+[br]
+
+[p][color=#800000]sortArray(int[] numbers, int length)[/color] - method to sort the array of integers from lowest to highest. Compares all numbers to one another in order to sort.[/p]
+[br]
+<pre><code class="language-java">
+public static void sortArray(int[] numbers, int length) {
+    for (int i = 0; i < length; ++i) {
+        for (int j = (i +1); j < length; ++j) {
+            int firstNum = numbers[i];
+            int secNum = numbers[j];
+            if (firstNum > secNum) {
+                int tempNum = firstNum;
+                numbers[i] = secNum;
+                numbers[j] = tempNum;
+            }
+        }
+    }
+}
+</code></pre>
+[br]
+
+[p][color=#800000]printMaxAndMin(int[] numbers, int length)[/color] - since the array was previously sorted, the smallest roll is expected to be the integer at the 0th index (index[0]), and the largest roll is expected to be at the last index, index[length - 1]. Note that the max() and min() methods from the Math library were not used.[/p]
+[br]
+<pre><code class="language-java">
+public static void printMaxAndMin(int[] numbers, int length) {
+    System.out.println("Smallest Roll : " + numbers[0]);
+    System.out.println("Largest Roll : " + numbers[length - 1]);
+}
+</code></pre>
+[br]
+
+[p][color=#800000]checkForSpecialCases(int[] numbers, int length)[/color] - this method counts the number of occurrences of the integers in the array. Note that before this method is called, the array was already ordered from lowest value to highest. Thus, it makes sense to compare the current integer being iterated over to the previous integer in the array. If the numbers are equal, the counter is increments. Else, the counter resets to 1 and the variable previousNum is set to the current number.[/p]
+[br]
+
+<pre><code class="language-java">
+public static void checkForSpecialCases(int[] numbers, int length) {
+    int numTimesOccurred = 0;
+    int counter = 1;
+    int previousNum = numbers[0];
+
+    for (int i = 1; i < length; ++i) {
+        int num = numbers[i];
+
+        if (num == previousNum) {
+            ++counter;
+        }
+        else {
+            if (counter > numTimesOccurred) {
+                numTimesOccurred = counter;
+            }
+            counter = 1;
+            previousNum = num;
+        }
+    }
+    if (counter > numTimesOccurred) {
+        numTimesOccurred = counter;
+    }
+    printSpecialCases(numTimesOccurred);
+}
+</code></pre>
+[br]
+
+[p][color=#800000]printSpecialCases(int numTimesOccurred)[/color] - contains a simple switch statement which checks if the argument passed in was equal to 4, 3, or neither one. If the case was 4, "Go to Vegas!" is outputted. If the case was 3, "Three of a kind." is outputted. Else, "Not so lucky." is outputted.[/p]
+[br]
+
+<pre><code class="language-java">
+public static void printSpecialCases(int numTimesOccurred) {
+    switch (numTimesOccurred) {
+        case 4:
+            System.out.println("Go to Vegas!");
+            break;
+        case 3:
+            System.out.println("Three of a kind.");
+            break;
+        default:
+            System.out.println("Not so lucky.");
+            break;
+    }
+}
+</code></pre>

@@ -1,0 +1,149 @@
+[h2]Assignment[/h2]
+[p]The assignment introduces more UI elements to be familiar with. This includes the UITabBarController, the UIPickerView, the MKMapView within the MapKit library, the UISegmentedControl, the UIActivityIndicatorView, the UIAlertController, and a review of the UISlider.[/p]
+[br]
+
+[h4]App Description[/h4]
+[p]This app will use a number of UI elements so the app will not make much sense as a single app. You will use a tab bar with a number of tabs. The view for each tab is described below.[/p]
+[br]
+
+[h4]Sports Tab[/h4]
+[p]The view at this tab will contain a custom picker view with two columns. The first column will contain a list of countries. When the user has selected a country, the second column will then display a list of sports in that country. The list of countries and their sports are given below. The view also has a slider. When the user selects the top (first) sport in the list. The slider moves all the way to the left. When the user selects the bottom (last) sport in the list the slider moves all the way to the right. When the user selects sports between the first and last the slider moves proportionally. So if Taiwan is selected and the user selects the second sport from the top then the slider moves 1/6 the way to the right. Conversely when the user moves the slider the picker will move to the corresponding sport.[/p]
+[br]
+
+<table id="cs646_assignment4_table">
+    <tr>
+        <th>Country</th>
+        <th>Sports</th>
+    </tr>
+    <tr>
+        <td>India</td>
+        <td>Cricket, Chess, Badminton, Field Hockey, Football, Tennis, Gilli-danda, Golf</td>
+    </tr>
+    <tr>
+        <td>USA</td>
+        <td>Baseball, Football, Curling, Basketball, Soccer, Rock Climbing, Skateboarding</td>
+    </tr>
+    <tr>
+        <td>Taiwan</td>
+        <td>Football, Archery, Baseball, Table Tennis, Cycling, Taekwondo</td>
+    </tr>
+</table>
+[br]
+
+[h4]Map Tab[/h4]
+[p]This view contains a map view. The map is centered on San Diego and zoomed in so that El Cajon and Escondido are labeled on the map.[br][br]The map view should also show the user's current location and should support giving directions between two locations.[/p]
+[br]
+
+[h4]Segment Tab[/h4]
+[p]This view has a segmented control with three options: Progress, Text, Alert. When the user selects the "Progress" option they see a switch and an inactive activity indicator. When they turn the switch "on" or to the left the activity indicator spins. When they turn the switch off the activity indicator stops spinning. When the user selects the "Text" option they see a Text View that they can enter text. The text view should start with some text. When they select the "Alert" option they will see a button. When they click on the button an alert will pop up asking the user "Do you like the iPhone?".[/p]
+[br]
+
+[h2]Implementation Details[/h2]
+[br]
+
+<h3 class="applicable_files">SportsViewController.swift</h3>
+[p]The view controller requires implementation of the [color=#664C90]UIPickerView[/color], which is a spinning wheel that lets the user choose from a set of options. The wheels are called components and they have indexed rows. In order for the UIPicker to work, the [color=#664C90]UIPickerViewDataSource[/color] and [color=#664C90]UIPickerViewDelegate[/color] protocols have to be adopted.[/p]
+[br]
+
+[list]
+    [*][color=#800000]numberOfComponents()[/color] - specifies how many components or wheels are being implemented. In this case, 2 components are needed.[/*]
+    [br]
+    [*][color=#800000]pickerView(UIPickerView, numberOfRowsInComponent: Int)[/color] - should return the correct number of items associated with the component. For the first component of index 0, the number of countries in the dictionary should be returned. For the second component, the number of sports for the selected country should be returned.[/*]
+    [br]
+    [*][color=#800000]pickerView(UIPickerView, titleForRow: Int, forComponent: Int)[/color] - the title, or in this case the name of the country or sport, to return for each row in each component. To do this, the component number was first filtered with a switch statement. Then the row parameter was used to access either the country name or the sports name at the correct index.[/*]
+    [br]
+    [*][color=#800000]pickerView(UIPickerView, didSelectRow: Int, inComponent: Int)[/color] - within component 0, or the list of countries, whenever the user selects a new country the [color=#664C90]selectedCountry[/color] variable is updated and the picker view is refreshed by reloading component 1, or the list of sports. The slider is also updated by dividing the index of the currently selected sport to the total number of sports for that country.[/*]
+[/list]
+[br]
+
+[p]Aside from setting the delegate to [color=#664C90]self[/color] and formatting the sliders, [color=#800000]viewDidLoad()[/color] attempts to access the Sports Property List to retrieve a dictionary in which the keys are the countries and the values are the list of sports for the countries. It takes the information from the dictionary to arrange the array of tuples which define the country and the associated sport.[/p]
+[br]
+
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project4_pickerview.gif[/img]
+</div>
+[br]
+
+<h3 class="applicable_files">MapViewController.swift</h3>
+[p]In order to annotate the [color=#664C90]MapView[/color], the [color=#00796B]MapAnnotations.swift[/color] file was made. The class provides the blueprint for the annotation object with the title, info., and coordinate properties. This view controller adopts the [color=#664C90]MKMapViewDelegate[/color] protocol.[/p]
+[br]
+
+[list]
+    [*][color=#800000]mapView(MKMapView, rendererFor: MKOverlay)[/color] - returns an [color=#664C90]MKPolylineRenderer[/color] object with a stroke color set to blue and line width to 5.[/*]
+    [br]
+    [*][color=#800000]mapView(MKMapView, viewFor: MKAnnotation)[/color] - allows annotation objects to be reused/recycled. This occurs by calling [color=#800000]dequeueReusableAnnotationView()[/color] on the map view with a declared id. For this assignment, an [color=#664C90]MKPinAnnotationView[/color] object is returned.[/*]
+    [br]
+    [*][color=#800000]viewDidLoad()[/color] - the NumericConstants Property List was accessed to retrieve a dictionary containing latitude and longitude coordinates values for San Diego, El Cajon, and Escondido. [color=#800000]centerMap()[/color] is called to initially center the map on San Diego, and then annotations were added to the map view for El Cajon and Escondido. If location services were enabled on the device, then the delegate and location accuracy is set on the [color=#664C90]CLLocationManager[/color] object.[/*]
+    [br]
+    [*][color=#800000]getDirections()[/color] - an action that takes the entered coordinates from the text fields to make a [color=#664C90]CLLocationCoordinate[/color] which is used to instantiate an [color=#664C90]MKPlacemark[/color], which is then used to instantiate an [color=#664C90]MKMapItem[/color]. After creating an [color=#664C90]MKDirectionRequest[/color] object, the source and destination is set using the [color=#664C90]MKMapItems[/color]. Lastly, the [color=#664C90]MKDirections[/color] object is instantiated which takes the request and [color=#800000]calculate()[/color] is called on it. The first route from the response is used to prepare the polyline to be set on the map view.[/*]
+[/list]
+[br]
+
+[p]The [color=#664C90]CLLocationManagerDelegate[/color] protocol is adopted and the [color=#800000]locationManager(CLLocationManager, didUpdateLocations: [CLLoation])[/color] method is implemented to get the user's current location and center the map on it. The "get user location" button will update the user's current location every time it is clicked, and the delegate (this view controller) will be notified of the new location data.[/p]
+[br]
+
+[p]The map is centered to San Diego when the application is first ran.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project4_mapdefault.png[/img]
+</div>
+[br]
+
+[p]When the user clicks on "Get Current Location", the map is then centered on the user's current location. The location was set to center on SDSU in the settings since this application was run on the simulator.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project4_mapcurrentlocation.png[/img]
+</div>
+[br]
+
+[p]When the user clicks on "Get Directions", the latitude and longitude values that were entered are used to create a polyline from the source to the destination. Here, the source was the user's current location and the destination was Los Angeles.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project4_mapdirections.png[/img]
+</div>
+[br]
+
+<h3 class="applicable_files">SegmentViewController.swift</h3>
+[p]Based on the selected index of the segmented control, either the Progress-, Text-, or AlertChildViewController's view will be added to the current view controller as a subview. The [color=#664C90]selectedSegmentIndex[/color] is set to 0 in [color=#800000]viewDidLoad()[/color]. Each instance of these child view controllers are instantiated lazily and added as children to the current view controller when it is needed. The following are helper methods that set the appropriate view controller.[/p]
+[br]
+[list]
+    [*][color=#800000]addChildVC()[/color] - takes in a view controller instance as the parameter and adds the view controller's view as the subview of the current view controller's view. [color=#800000]didMove(toParentViewController)[/color] is called on the child view controller to notify the transition.[/*]
+    [br]
+    [*][color=#800000]updateChildVC()[/color] - depending on the selected segment index, the other view controllers will be hidden while the one selected will be visible. Any segment index that doesn't pull up the TextChildViewController will result in the keyboard being hidden.[/*]
+[/list]
+[br]
+
+[p](1) [color=#00796B]ProgressChildViewController.swift[/color][br]
+Contains a switch control that, when clicked, activates the [color=#664C90]UIActivityIndicator[/color]. In [color=#800000]viewDidLoad()[/color], the activity indicator style and color are set and by default the indicator should not be animating. In [color=#800000]switchValueChanged()[/color] when the switch control is on, the indicator will animate, otherwise it will not.[/p]
+[br]
+
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project4_progress.gif[/img]
+</div>
+[br]
+
+[p](1) [color=#00796B]TextChildViewController.swift[/color][br]
+Contains a text view that the user can enter text into. A notable aspect of the implementation is getting the text view to adapt or change its size whenever the keyboard is brought up. In this case, the text view minimizes its height to make room for the keyboard so that text won't be blocked. The observers that listen to when the keyboard will hide or show is set in viewWillAppear() and removed in viewWillDisappear().[br][br]
+
+Both [color=#800000]keyboardWillShow(NSNotification)[/color] and [color=#800000]keyboardWillHide(NSNotification)[/color] will get the change in height by calling [color=#800000]keyboardChangeInHeight()[/color]. They will call [color=#800000]moveView()[/color] if the difference is between 40 and 80. The only difference is the value passed to moveView(), which is a negative value if they keyboard is being shown and a positive value if it's being hidden.[br][br]
+
+[color=#800000]keyboardChangeInHeight()[/color] - returns the change in the keyboard's height by getting the height of the keyboard's frame before and after it changed.[br][br]
+
+[color=#800000]moveView()[/color] - animates the transformation of the text view. The method adds to the current height of the text view.
+[/p]
+[br]
+
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project4_text.gif[/img]
+</div>
+[br]
+
+[p](3) [color=#00796B]AlertChildViewController.swift[/color][br]
+Clicking on the button will trigger an action called [color=#800000]triggerAlert()[/color]. This will bring up an alert controller that asks the user if he or she likes the iphone. The user can click "yes" or "no" to dismiss the controller.
+[/p]
+[br]
+
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project4_alert.gif[/img]
+</div>
+

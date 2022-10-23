@@ -1,0 +1,86 @@
+[h2]Assignment[/h2]
+[p]The assignment introduces UIKit, views, controls, and other aspects of the framework. More specifically, it asks for implementation of the keyboard for text input, text fields and buttons, dialogs, sliders, and touches on persistence of data.[/p]
+[br]
+
+[h4]The Application[/h4]
+[p]Implement a Swift iOS app that contains three text fields (Red, Green Blue) with labels, one button (with label Color) and a UIView. The UIView we will call the color view.[br][br] The color view starts with a black background. The user is to enter values 0 through 100 in the text fields. When one presses the button the background color of the color view is changed using the values that the user entered in the text fields. Sample screen shot below. Note that the keyboard is not shown after pressing the button.[br][br] The application should store the values in the text fields. So when the user "kills" the application and then restarts the app the values in the test fields are restored to the values they had before the app was killed and the color view is the same color is was before the app was killed. Killing the app is different than just placing the app in the background.[/p]
+[br]
+
+[p]When the user enters a number less than 0 or more than 100 display a warning that the input is out of range. Change the number in the text field to the closest valid number to the value the user entered.[br][br]Don’t allow the user to enter a number outside the range of 0 to 100.[br][br]Add sliders to allow the user to change the colors with three sliders. As a user changes the slider the value in the corresponding text field and the color of the color view should change.[/p]
+[br]
+
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project3_preview.png[/img]
+</div>
+
+[h2]Implementation Details[/h2]
+
+[h3]Brief Overview[/h3]
+[p]The property that is used and stored in <span class="code_CS646">UserDefaults</span> to allow the data to persist is an array called <span class="code_CS646">storedColors</span> of type Int. It saves the RGB values in an array. Every time the user clicks the color button or changes the value of a slider, the RGB values in <span class="code_CS646">storedColors</span> is updated. This occurs in <span class="code_CS646">setTextAndColor()</span>. An important aspect to this app is persistence of the data so that when the user kills the app and starts it up again, it returns to the same state before the user killed it. Because the app is small, the details of each method are explained thoroughly.[/p]
+[br]
+
+[h3]IBActions[/h3]
+[list]
+    [*]<span class="code_method">colorButtonPressed()</span> - sets both the color view and all of the sliders to the values the user inputted into the textfields for the RGB. The method first does optional binding on each textfield value, then checks if the values were empty or could not be casted to an Int before continuing. It then calls <span class="code_CS646">checkNumberRange()</span> to validate the inputs before calling <span class="code_CS646">setTextAndColor()</span> and <span class="code_CS646">setSliderValues()</span>.[/*]
+    [br]
+    [*]<span class="code_method">sliderValueChanged()</span> - every time the user dragged the slider to a new value, <span class="code_CS646">setTextAndColor()</span> is called to change the color displayed in the color view. This action handler is triggered for each of the 3 sliders.[/*]
+[/list]
+[br]
+
+[h3]Methods[/h3]
+[list]
+    [*]<span class="code_method">checkNumberRange()</span> - validates the 3 textfields by restricting the input to a numerical range, from 0 to 100. If the user entered anything less than 0 or anything more than 100, the values are set to 0 and 100 respectively. If they've done this, an alert is shown that informs the user that the input was out of range. A tuple is returned with the potentially-changed RGB values.[/*]
+    [br]
+    [*]<span class="code_method">setTextAndColor()</span> - either called whenever the color button was clicked, or when any one of the slider values change. The newly, changed RGB values are set and displayed in the appropriate textfields and then updated in the <span class="code_CS646">storedColors</span> array. The background color of the color view is subsequently updated. Since the initializer for <span class="code_CS646">UIColor</span> takes CGFloat values from 0.0 to 1.0, the RGB values (which the user can only enter from 0 to 100) were divided by 100.[/*]
+    [br]
+    [*]<span class="code_method">setSliderValues()</span> - called when the user clicks the color button. Sets the new values for the sliders.[/*]
+[/list]
+[br]
+
+[h3]Application Lifecycle Methods[/h3]
+[list]
+    [*]<span class="code_method">viewDidLoad()</span> - sets the keyboard type to <span class="code_CS646">numberPad</span>, the appearance to <span class="code_CS646">dark</span>, and the <span class="code_CS646">minimum</span> and <span class="code_CS646">maximum</span> values for the sliders. The shared <span class="code_CS646">UserDefaults</span> object is accessed to check for existing keys for <i>"TextValues"</i>, <i>"SliderValues"</i>, and <i>"ColorValues"</i>. If the keys exist, meaning that the data was previously saved, then the saved values expected to be arrays were accessed. The text fields, sliders, and color for the color view were updated with the persistent data. If the keys don't exist, then default values for the fields, sliders, and color are used. The view controller is registered for notifications when the app enters the background.[/*]
+    [br]
+
+    [*]<span class="code_method">applicationDidEnterBackground()</span> - saves the data of the text fields, slider values, and the <span class="code_CS646">storedArray</span> in the shared <span class="code_CS646">UserDefaults</span> object. Gives each object to be saved a key, creating a new key-value pair if the key doesn't exist, or creates that new key if it does.[/*]
+    [br]
+    
+    [*]<span class="code_method">deinit</span> - accesses <span class="code_CS646">NotificationCenter.default</span> to remove the observer which was set in <span class="code_CS646">viewDidLoad()</span>.[/*]
+[/list]
+
+[h2]Running the App[/h2]
+[br]
+
+[p]The default view when the user first runs the application. RGB values are all 0 and color view is black.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project3_default.png[/img]
+</div>
+[br]
+
+[p]The color of the view changes when RGB values are entered and the color button is clicked.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project3_colorbutton.gif[/img]
+</div>
+[br]
+
+[p]The color of the view changes whenever one of the slider values change.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project3_sliders.gif[/img]
+</div>
+[br]
+
+[p]The values are restricted between 0 and 100 when RGB values entered are out of range.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project3_outofrange.gif[/img]
+</div>
+[br]
+
+[p]The data is persisted when the user kills the app and runs it again.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project3_killapp.gif[/img]
+</div>

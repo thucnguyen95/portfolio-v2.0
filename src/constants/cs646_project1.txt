@@ -1,0 +1,431 @@
+[h2]Assignment[/h2]
+[p]The assignment asks questions dealing with the basic syntax of Swift 4.0. The code had to be compiled and ran in XCode using Playground.[/p]
+[br]
+
+[list]
+    [*]A palindrome is a string that reads the same forwards and backwards. We will call a number a palindrome if it reads the same forwards and backwards. So 191 is a palindrome. Write a function that returns the number of palindrome numbers between 0 and n.[/*]
+    [br]
+
+    [*]If we list all the natural numbers below 20 that are multiples of 3 or 5 but not multiples both of 3 and 5, we get 3, 5, 6, 9, 10, 12, 18. The sum of these multiples is 63. Write a function, sumMultiples3_5, that returns the sum of the multiples of 3 and 5 less than N. So[br][br]
+    [color=#664C90]sumMultiples3_5(20) == 63[/color][/*]
+    [br]
+
+    [*]Write a function patternCount with two arguments. The first arguments is a string, let's call it text, and the second argument is also a string, call it pattern. The function patternCount returns the number of times the pattern occurs in the text. For example:[br][br]
+    [color=#664C90]
+    patternCount(string: "abababa", pattern: "aba") == 3[br]
+    patternCount(string: "aaaaa", pattern: "aa") == 4[br]
+    patternCount(string: "Abcde", pattern: "abc") == 0[/color][/*]
+    [br]
+
+    [*]Write a Swift function, call it popularClasses, that has one argument, an array of sets of courses, and returns the intersection of all the sets in the array. In the code below popularClasses would return {“CS237”}.[br][br]
+    [color=#664C90]
+    let studentA: Set = ["CS101", "CS237", "CS520"][br]
+    let studentB: Set = ["CS101", "Math245", "CS237"][br]
+    let studentC: Set = ["CS237", "CS560"][br]
+    popularClasses([studentA, studentB, studentC])[/color][/*]
+    [br]
+
+    [*]Write a Swift function, call it average, that has one argument, an array of Ints, and returns an optional double, which is the average of the inputs ints. If the input array is empty return the optional value nil.[/*]
+    [br]
+    
+    [*]Write a Swift function average2 which is the same as average in problem 5 except that the input is an array of optional ints.[/*]
+    [br]
+
+    [*]Write a Swift function cost that has one argument a dictionary. The dictionary has three keys: “name”, “price”, and “quantity”. The function cost returns the cost of the item, that is the price * quantity. The keys and values in the dictionary are all strings. The value at “price” is the string of a double like “3.45”. The string at “quantity” is the string of an integer. Note that if either the key “price” or “quantity” is not in the dictionary the function “cost” returns 0 (zero). Examples given below.[br][br]
+    [color=#664C90]
+    let iceCreamA = ["name": "Mochie Green Tea", "quantity": "2", "price": "2.3"][br]
+    let iceCreamB = ["name": "Mochie Green Tea", "price": "2.3"][br]
+    [br]
+    cost(iceCreamA)&nbsp;&nbsp;&nbsp;&nbsp;// returns 4.6[br]
+    cost(iceCreamB)&nbsp;&nbsp;&nbsp;&nbsp;// returns 0[/color][/*]
+    [br]
+
+    [*]Write a Swift function wordCount that has two arguments, a string and an Int. The string contains words separated by a space. For example “cat bat cat rat mouse bat”. wordCount returns a dictionary where the keys are the words in the string and the values are the number of times the word appears in the list. Only the words that occur at least as many times as the second argument are in the dictionary.[br][br]
+    [color=#664C90]
+    wordCount(words: “cat bat cat rat mouse bat”, count: 1) returns [“cat”: 2, “bat”: 2 “rat”: 1, “mouse”: 1][br]
+    wordCount(words: “cat bat cat rat mouse bat”, count: 2) returns [“cat”: 2, “bat”: 2 ][br]
+    wordCount(words: “cat bat cat rat mouse bat”, count: 3) returns [:][/color][/*]
+    [br]
+
+    [*]Write a Swift function wordCount2 that has the same arguments as wordCount in problem 7 and returns the same result. However give the second argument a default value of 2 so we can call the function with one or two arguments as shown below.[br][br]
+    [color=#664C90]
+    wordCount2(words: “cat bat cat rat mouse bat”) returns [“cat”: 2, “bat”: 2 ][br]
+    wordCount2(words: “cat bat cat rat mouse bat”, count: 3) returns [:][/color][/*]
+    [br]
+
+    [*]Write a Swift function wordCount3 that has one argument an Int, which has the same role as the second argument of wordCount. wordCount3 returns a function. The return function has one argument a String that contains words. When evaluated the returned function returns the dictionary of words in the string with the number of times the word appears in the list. But as in problem 7 it only contains the words that occur as many times as the argument to wordCount3. See examples below.[br][br]
+    [color=#664C90]
+    let testA = wordCount3(2)[br]
+    testA(words: “cat bat cat rat mouse bat”)[br]
+    // returns [“cat”: 2, “bat”: 2 ][br]
+    testA(words: “a a a b c c”)[br]
+    // returns [“a”: 3, “c”: 2][br]
+    let testB = wordCount3(3)[br]
+    testB(words: “a a a b c c”)[br]
+    // returns [“a”: 3][/color][/*]
+[/list]
+[br]
+
+[h2]Implementation Details[/h2]
+[p][b]Note[/b]: The following layout shows how my original implementation and the more concise and straightforward way, written by [b]Professor Whitney[/b], to implement it using higher-order functions.[/p]
+[br]
+
+[p][b]1)[/b] Both implementations use the idea of looping through the range of numbers and reading it forwards and backwards to see if they match. However, the original implementation didn't make use of high-order functions. In the code, the range was established using the parameters [color=#664C90]from[/color] and [color=#664C90]to[/color], and [color=#664C90]filter()[/color] was called which took the [color=#664C90]isPalindrome[/color] helper function as the closure. filter() was chained with the [color=#664C90]count[/color] property. So for each number within the range that returns true as a palindrome, it would be added to an array and the array's length was returned.[/p]
+[br]
+
+<pre><code class="language-swift">
+// Original Implementation
+func findPalindromes(n: Int) -&gt; Int {
+    var numberOfPalindromes = 0
+
+    for number in 0...n {
+        var reverseNumber = 0
+        var modifiedNumber = number
+
+        while (modifiedNumber &gt; 0) {
+            let remainder = modifiedNumber % 10
+            reverseNumber = (reverseNumber * 10) + remainder
+            modifiedNumber /= 10
+        }
+        if (reverseNumber == number) {
+            numberOfPalindromes += 1
+        }
+    }
+    return numberOfPalindromes
+}
+
+// Improved Implementation
+func isPalindrome(_ value: String) -&gt; Bool {
+    return value == String(value.reversed())
+}
+
+func isPalindrome(_ value: Int) -&gt; Bool {
+    return isPalindrome(String(value))
+}
+
+func palindromes(from: Int, to: Int) -&gt; Int {
+    guard from &gt;= 0 && to &gt;= from else {
+        return 0
+    }
+    return (from...to).filter(isPalindrome).count
+}
+
+// Testing Output
+palindromes(from: 0, to: 10) == 10
+palindromes(from: 0, to: 22) == 12
+palindromes(from: 0, to: 100) == 19
+</code></pre>
+[br]
+
+[p][b]2)[/b] The original implementation was simple. Every number to n was iterated over and the modulus of 3 and 5 was taken and checked to see if it resulted in 0. If it did, then it would be added to the current sum. The second approach was more concise because it chains the [color=#664C90]filter()[/color] and [color=#664C90]reduce()[/color] functions together. The filter method checks if each number returned 0 when taking the modulus of 5 or 3 but not 15. The reduce method then goes through the array that filter returns to return a single value representing the sum.[/p]
+[br]
+<pre><code class="language-swift">
+// Original Implementation
+func sumMultiples3_5(n: Int) -&gt; Int {
+    guard (n &gt; 0) else {
+        return 0
+    }
+
+    var sum = 0
+
+    for number in 0...(n-1) {
+        if ((number % 3) == 0) && ((number % 5) == 0) {
+            continue
+        }
+        if (number % 3 == 0) || (number % 5 == 0) {
+            sum += number
+        }
+    }
+    return sum
+}
+
+// Improved Implementation
+func isMultiple3or5not15(n : Int) -&gt; Bool {
+    switch n {
+    case let x where (x % 15 == 0):
+        return false
+    case let x where (x % 3 == 0):
+        return true
+    case let x where (x % 5 == 0):
+        return true
+    default:
+        return false
+    }
+}
+
+func sumMultiples3_5(_ n: Int) -&gt; Int {
+    guard n &gt; 0 else {
+        return 0
+    }
+    return (3..&lt;n).filter(isMultiple3or5not15).reduce(0, +)
+}
+
+// Testing Output
+sumMultiples3_5(6) == 8
+sumMultiples3_5(11) == 33
+sumMultiples3_5(20) == 63
+sumMultiples3_5(-1) == 0
+</code></pre>
+                [br]
+                [p][b]3)[/b] The original implementation loops through the string as many times as the difference between the string's length and the pattern's length. For every loop, the offset from the beginning of the string is incremented. If the substring, which starts from the determined offset and ends at the pattern's length, matches the pattern, the variable representing the number of matches was incremented. The improved approach is to use [color=#664C90]filter()[/color] and pass a helper method. The helper method required the offset for the string and the pattern and used the [color=#664C90]suffix()[/color] and [color=#664C90]hasPrefix()[/color] String methods in order to see if the pattern was contained within the subsequence after the offset.[/p]
+                [br]
+<pre><code class="language-swift">
+// Original Implementation
+func patternCount(text: String, pattern: String) -&gt; Int {
+    var count = 0
+    var index = 0
+    let textLength = text.count
+    let patternLength = pattern.count
+
+    if (patternLength > textLength) {
+        return 0
+    }
+
+    while (index &lt;= (textLength - patternLength)) {
+        let start = text.index(text.startIndex, offsetBy: index)
+        let end = text.index(text.startIndex, offsetBy: (index + patternLength))
+        let range = start..&lt;end
+
+        let textSubString: Substring = text[range]
+
+        if (textSubString == pattern) {
+            count += 1
+        }
+        index += 1
+    }
+    return count
+}
+
+// Improved Implementation
+extension String {
+    func midfix(start: String.Index, text: String) -&gt; Bool {
+        return self.suffix(from: start).hasPrefix(text)
+    }
+}
+
+func patternCount(text: String, pattern: String) -&gt; Int {
+    guard text.count &gt; 0 && pattern.count &gt; 0 &&
+        pattern.count &lt;= text.count else {
+            return 0
+        }
+    return text.indices.filter({text.midfix(start: $0, text: pattern)}).count
+}
+
+// Testing Output
+patternCount(text: "abababa", pattern: aba"") == 3
+patternCount(text: "aaaaa", pattern: "aa") == 4
+patternCount(text: "Abcde", pattern: "abc") == 0
+patternCount(text: "Abcde", pattern: "Abcde") == 1
+patternCount(text: "Abcde", pattern: "Abcdea") == 0
+patternCount(text: "Abcde", pattern: "") == 0
+patternCount(text: "", pattern: "abc") == 0
+</code></pre>
+[br]
+
+[p][b]4)[/b] The original implementation used the first set as a reference. For each item in the first set, it would loop through the subsequent sets to see if those sets contained the item. If at the end of the loop the count was equal to the number of sets, then the item is concluded to intersect all sets. The second approach uses [color=#664C90]reduce()[/color] and the Set [color=#664C90]intersection()[/color] method to compare two sets to find a match. The function returns the intersected value if it is contained in all sets. The second approach takes into consideration multiple values that intersect the sets.[/p]
+[br]
+<pre><code class="language-swift">
+// Original Implementation
+func popularClasses(classSets: [Set&lt;String&gt;]) -&gt; String {
+    let emptyString: String = ""
+
+    if (classSets.isEmpty) || (classSets.count == 1) {
+        return emptyString
+    }
+
+    let firstSet: Set&lt;String&gt; = classSets[0]
+    for classes in firstSet {
+        var count = 1
+
+        for sets in classSets[1...] {
+            if sets.contains(classes) {
+                count += 1
+            }
+        }
+        if (count == classSets.count) {
+            return classes
+        }
+    }
+    return emptyString
+}
+
+// Improved Implementation
+func popularClasses(_ students: [Set&lt;String&gt;]) -&gt; Set&lt;String&gt; {
+    guard students.count &gt; 0 else {
+        return []
+    }
+    return students.reduce(students[0], {$0.intersection($1)})
+}
+
+// Testing Output
+let studentA: Set = ["CS101", "CS237", "CS520"]
+let studentB: Set = ["CS101", "Math245", "CS237"]
+let studentC: Set = ["CS237", "CS560"]
+let studentD: Set&lt;String&gt; = []
+let studentE: Set = ["cs646"]
+
+popularClasses([studentA, studentB, studentC]) == ["CS237"]
+popularClasses([]) == []
+popularClasses([studentA, studentD]) == []
+popularClasses([studentA, studentB, studentE]) == []
+popularClasses([studentA]) == ["CS101", "CS237", "CS520"]
+</code></pre>
+[br]
+
+[p][b]5)[/b] The original implementation loops through the elements in the array, casts it to a Double, sums it, and returns the average. The improved implementation uses [color=#664C90]reduce()[/color] to sum up the values first, and then takes the average.[/p]
+[br]
+
+<pre><code class="language-swift">
+// Original Implementation
+func average(array: [Int]) -&gt; Double? {
+    if array.isEmpty {
+        return nil
+    }
+
+    var sum: Double = 0
+    for number in array {
+        let numberD = Double(number)
+        sum += numberD
+    }
+    return (sum / 2)
+}
+
+// Improved Implementation
+func average(_ data: [Int]) -&gt; Double? {
+    guard data.count &gt; 0 else {
+        return nil
+    }
+    let sum = data.reduce(0, +)
+    return Double(sum) / Double(data.count)
+}
+</code></pre>
+[br]
+
+[p][b]6)[/b] Same as implementing question 5 but takes care of optionals in the guard block.[/p]
+[br]
+
+<pre><code class="language-swift">
+// Original Implementation
+func average2(array: [Int?]) -&gt; Double? {
+    if array.isEmpty {
+        return nil
+    }
+    if array.contains(where: {$0 == nil}) == true {
+        return nil
+    }
+
+    var sum: Double = 0
+    for number in array {
+        let numberD = Double(number!)
+        sum += numberD
+    }
+    return (sum / 2)
+}
+
+// Improved Implementation
+func average2(_ data: [Int?]) -&gt; Double? {
+    guard data.count &gt; 0 &&
+        data.contains(where: {$0 == nil}) == false else {
+        return nil
+    }
+    let sum = data.reduce(0, {$0 + $1!})
+    return Double(sum) / Double(data.count)
+}
+</code></pre>
+[br]
+
+[p][b]7)[/b] Uses guard blocks to check if price or quantity is not nil using optional binding, and then returns the product of the value for price and quantity.[/p]
+[br]
+<pre><code class="language-swift">
+// Original Implementation
+func cost(dictionary: Dictionary&lt;String, String&gt;) -&gt; Double {
+    guard let priceValue = dictionary["price"], let quantityValue = dictionary["quantity"] else {
+        return 0
+    }
+
+    guard let priceNum = Double(priceValue), let quantityNum = Double(quantityValue) else {
+        return 0
+    }
+    return priceNum * quantityNum
+}
+
+// Improved Implementation
+func cost(of order: Dictionary&lt;String, String&gt;) -&gt; Double? {
+    guard (order.count &gt; 0) else {
+        return nil
+    }
+    guard let quantityString = order["quantity"],
+            let quantity = Double(quantityString),
+            let priceString = order["price"],
+            let price = Double(priceString) else {
+        return 0.0
+    }
+    return quantity * price
+}
+</code></pre>
+[br]
+
+[p][b]8)[/b] Splits the string into an array by using a space as the separator. The dictionary is then built with the words as the keys and the number of occurrences as the values. If the key doesn't exist yet, it is created with a value of 1. The dictionary is looped over again and for any value that is less than the minimum, the key-value pair is removed.[/p]
+[br]
+
+<pre><code class="language-swift">
+func wordCount(words: String, minimum: Int) -&gt; Dictionary&lt;String, Int&gt; {
+    let wordsArray = words.components(separatedBy: " ")
+    var dictionary = [String : Int]()
+
+    for word in wordsArray {
+        if (dictionary.keys.contains(word)) {
+            if var number = dictionary[word] {
+                number += 1
+                dictionary[word] = number
+            }
+        }
+        else {
+            dictionary[word] = 1
+        }
+    }
+    for (key, value) in dictionary {
+        if (value &lt; minimum) {
+            dictionary.removeValue(forKey: key)
+        }
+    }
+    return dictionary
+}
+</code></pre>
+[br]
+
+[p][b]9)[/b] was straightforward, the second parameter only needed to be given a default value, so the implementation details are skipped.[/p]
+[br]
+
+[p][b]10)[/b] The only difference between this question and question 8 is that the implementation occurs in a nested function. This makes it possible for the function to return a function containing the implementation.[/p]
+[br]
+
+<pre><code class="language-swift">
+func wordCount3(minimum: Int) -&gt; (String) -&gt; Dictionary&lt;String, Int&gt; {
+
+    func wordCountReturn(words: String) -&gt; Dictionary&lt;String, Int&gt; {
+        let wordsArray = words.components(separatedBy: " ")
+        var dictionary = [String: Int]()
+
+        for word in wordsArray {
+            if (dictionary.keys.contains(word)) {
+                if var number = dictionary[word] {
+                    number += 1
+                    dictionary[word] = number
+                }
+            }
+            else {
+                dictionary[word] = 1
+            }
+        }
+        for (key, value) in dictionary {
+            if (value &lt; minimum) {
+                dictionary.removeValue(forKey: key)
+            }
+        }
+        return dictionary
+    }
+
+    return wordCountReturn
+}
+</code></pre>

@@ -1,0 +1,497 @@
+[h2]Assignment[/h2]
+[p]The assignment focuses on networks and protocols, primarily using GET and POST URLs to communicate with a server to retrieve and post user data. It also requires integration of maps similar to assignment 4.[/p]
+[br]
+
+[h4]App Description[/h4]
+[p]This app will allow users to post where they are from and allow them to see on a map where others are from. The app has two basic parts. The first part is posting the user information and the second is viewing the data posted by other users.[/p]
+[br]
+
+[h4]Posting User Information[/h4]
+[p]The user posts 8 pieces of information described below.[/p]
+[br]
+
+[p](1) [b]nickname[/b] - A string used to identify the user to others. Any two users can not use the same nickname, in other words the nicknames are unique. Nicknames are case insensitive. That is “FooBar” is considered the same as “foobar”. Required.[/p]
+[br]
+[p](2) [b]password[/b] - A string determined by the user. Passwords must be at least three characters long. Required.[/p]
+[br]
+[p](3) [b]country[/b] - A string which is the country the user is from. The list of supported countries is available from the server (see server protocol below). The server does not accept posts containing countries not supported by the server. Required.[/p]
+[br]
+[p](4) [b]state[/b] - A string which is the state/providence the user is from in their country. The list of supported states is available from the server (see server protocol below). The server does not accept posts containing states not supported by the server. Required.[/p]
+[br]
+[p](5) [b]city[/b] - A string which is the city the user is from. The server does not have a list of cities. Required.[/p]
+[br]
+[p](6) [b]year[/b] - An integer representing the year the user started attending SDSU. The year needs to between 1970 and 2017. Required.[/p]
+[br]
+[p](7) [b]longitude[/b][/p]
+[br]
+[p](8) [b]latitude[/b][/p]
+[br]
+
+[p]The longitude and latitude of the user's hometown, or if the user prefers, of their actual home. Only people in a few professions knows the latitude and longitude of anything, so do not ask the user to enter these numbers. Show them a map and let them mark a point on the map. Use this point to determine the latitude and longitude. Latitude values are doubles in the interval [-90, 90] and Longitude values are doubles in the interval [-180, 180). These values are optional in the sense that the user data can be sent to the server without them. You will lose points if you can not do this.[/p]
+[br]
+
+[h4]Viewing User's Hometown[/h4]
+[p]The app gives the user two ways to view the hometowns posted to the server. The first is as a list and the second is as markers on a map. When showing the data as a list the viewer needs to be able to access the nickname, country, state and city of each entry. In the map tapping on the marker should provide the nickname of the person represented by the marker. The user needs to be able to filter data by country and year. The user may only want to see locations of users in California, or users that started SDSU in 2016, or users in California that started SDSU in 2015.[/p]
+[br]
+
+[h4]Server Protocol[/h4]
+[p]The server supports 6 GET requests and 1 POST request detailed below.[br][br]
+When a request is successful it will return a response with the HTTP status 200. If there is a problem with the request the response will have a HTTP status of 404 or 400. When you request a URL that does not exists you will get a 404 response and the body of the response will be HTML. This can happen when you mistype the URL. Other errors will return a response with a 400 or 404 status and the body of the response will be JSON. This can happen if you do not include a required parameter, misspell a parameter or have a value that is out of range or the wrong type. All 200 responses indicate that their bodies contain JSON data.[br][br]
+Note that the URLs given below are case sensitive. The path and all query parameter names
+are lower case.[/p]
+[br]
+
+[h4]GET URLs[/h4]
+[p]https://bismarck.sdsu.edu/hometown/countries[/p]
+[p]
+Parameter: None[br]
+Returns JSON array of strings, the names of the countries currently supported[br]
+Sample return value:[br]
+["China","India","Mexico","USA"]
+[/p]
+[br]
+
+[p]https://bismarck.sdsu.edu/hometown/states?country=ACountryName[/p]
+[p]
+Parameter: ACountryName = one of the country names returned from the first URL[br]
+Sample: https://bismarck.sdsu.edu/hometown/states?country=USA[br]
+Return JSON array of string, names of the states/providences in given country[br]
+Sample return value (Shortened for space reasons)[br]
+["Alabama","Alaska","Arizona","Wyoming"]
+[/p]
+[br]
+
+[p]https://bismarck.sdsu.edu/hometown/nicknameexists?name=ANickName[/p]
+[p]
+Parameter: ANickName = A nickname that you wish to see if is already used[br]
+Sample: https://bismarck.sdsu.edu/hometown/nicknameexists?name=foo[br]
+Returns: JSON boolean. Returns true if nickname is already in use.[br]
+Sample return value:[br]
+false
+[/p]
+[br]
+
+[p]https://bismarck.sdsu.edu/hometown/count[/p]
+[p]
+Parameter: None[br]
+Returns: Integer number of current users. As new users can be added to the server at any time this value may not be correct for very long. The actual number of users may be larger.[br]
+Sample return value:[br]
+12
+[/p]
+[br]
+
+[p]https://bismarck.sdsu.edu/hometown/nextid[/p]
+[p]
+Parameter: None[br]
+Returns: The id that will be used for the next user. This is only useful when using the page query parameter with the reverse query.[br]
+Sample return value:[br]
+3
+[/p]
+[br]
+
+[p]https://bismarck.sdsu.edu/hometown/users[/p]
+[p]The URL returns a JSON array of the users that have been added to the server. Each user is a JSON object. The keys in the object are: nickname, country, state, city, year, longitude, latitude, id and timestamp. The values at the keys nickname, country, state, city, year are as sent in the adduser post (see below). If the longitude and latitude are not give in the adduser post the values returned are 0. Each user has an id, which is added by the server. Ids are integers. The ids are unique and are increasing. Below is an sample response from the server. It is what the server returns after the two samples in the POST URL section are sent to the server. Since rew2 was sent after rew that user has an larger id. The time stamp is when the user data was received by the server in UTC.[/p]
+[br]
+[p]Note that the list of users by default is sorted by increasing id. That is users that were added to the server earlier are listed earlier. The list is sorted by increasing time stamp.[/p]
+<pre>
+[{
+    "nickname": "rew",
+    "city: "Devils Lake",
+    "longitude": 0,
+    "state": "North Dakota",
+    "year": 1985,
+    "id": 1,
+    "latitude": 0,
+    "time-stamp": "2017-03-01T02:44:03.247Z",
+    "country": "USA"
+},
+{
+    "nickname": "rew2",
+    "city": "Minneapolis",
+    "longitude": -93.293753,
+    "state": "Minnesota",
+    "year": 1985,
+    "id": 2,
+    "latitude": 44.96606,
+    "time-stamp": "2017-03-01T20:31:00.632Z",
+    "country": "USA"
+}]
+</pre>
+[br]
+
+[p]This request has 9 optional query parameters. These are used to further specify which users to return or to reverse the order of the list. These are described below.[/p]
+[br]
+
+[p]
+[b]country[/b][br]
+Sample: https://bismarck.sdsu.edu/hometown/users?country=USA[br]
+Returns only the users in the given country.[/p]
+[br]
+
+[p]
+[b]state[/b][br]
+Sample: https://bismarck.sdsu.edu/hometown/users?state=Minnesota[br]
+Returns only the users in the given state.[/p]
+[br]
+
+[p]
+[b]city[/b][br]
+Sample: https://bismarck.sdsu.edu/hometown/users?city=Minneapolis[br]
+Returns only the users in the given city. Since different cities can have the same name (Paris, France & Paris, California) it is best to combine this with country and state query parameters. For example:[br]
+https://bismarck.sdsu.edu/hometown/users?country=USA&state=Minnesota&city=Minneapolis[/p]
+[br]
+
+[p]
+[b]year[/b][br]
+Sample: https://bismarck.sdsu.edu/hometown/users?year=1985[br]
+Returns only the users that started SDSU in the given year.[/p]
+[br]
+
+[p]
+[b]afterid[/b][br]
+Sample: https://bismarck.sdsu.edu/hometown/users?afterid=1[br]
+Returns only the users with ids strictly greater than the one given.[/p]
+[br]
+
+[p]
+[b]beforeid[/b][br]
+Sample: https://bismarck.sdsu.edu/hometown/users?beforeid=2[br]
+Returns only the users with ids strictly less than the one given.[/p]
+[br]
+
+[p]
+[b]reverse[/b][br]
+Sample: https://bismarck.sdsu.edu/hometown/users?reverse=true[br]
+When the value of reverse is true the order of the list returned is in reverse order. That is the most recent user added is now first in the returned list rather then last. That is the return list is sorted by timestamp with time decreasing, which is the same as sorting by decreasing id.[/p]
+[br]
+
+[p]
+[b]page[/b][br]
+Sample: https://bismarck.sdsu.edu/hometown/users?page=0[br]
+When the list of users gets long it may not be practical to get the entire list in one request. Then this query parameter is present the list is divided into groups or pages. The default size of the group or page is 25 users. This can be change. See pagesize below. When page=0 you get the first 25 users. When page=1 you get the second 25 users. To get the entire list you increase the value by 1 until you get back an empty list. If you use pages with the reverse set to true you have to be careful. Pages are computed on the current list of users. On a reverse list first query to get the nextid then always use the beforeid with the page as in the following:[br]
+https://bismarck.sdsu.edu/hometown/users?page=2&reverse=true&beforeid=30[/p]
+[br]
+
+[p]
+[b]pagesize[/b][br]
+Sample: https://bismarck.sdsu.edu/hometown/users?page=0&pagesize=5[br]
+This changes the size of pages from the default 25. Only has an affect when used with the page query.[/p]
+[br]
+[p]The query parameters above can be used individually or combined. You can use all or none of them. The order they are listed the URL does not matter.[/p]
+[br]
+
+[h4]POST URL[/h4]
+[p]https://bismarck.sdsu.edu/hometown/adduser[/p]
+[p]Body of the request: The body of the request is a JSON object with 6 required keys and 2 optional keys which are nickname, password, country, state, city, year, longitude, latitude. The latter two are optional. These are described above in the “Posting User Information” section. Two samples are:[/p]
+[br]
+<pre>
+{
+    "nickname" : "rew",
+    "password" : "catman",
+    "country" : "USA",
+    "state" : "North Dakota",
+    "city" : "Devils Lake",
+    "year" : 1985}
+    {"nickname" : "rew2",
+    "password" : "guess",
+    "country" : "USA",
+    "state" : "Minnesota",
+    "city" : "Minneapolis",
+    "year" : 1985,
+    "latitude" :44.966060,
+    "longitude" : -93.293753
+}
+</pre>
+[br]
+
+[p]If the post is successful then the server response has status code 200 and the body contains the string “ok”.[/p]
+
+[h2]Implementation Details[/h2]
+[p][b]Note[/b]: The code relating to connecting to the server and retrieving data can be abstracted for code reusability. Thus, a lot of the code for this task is redundant. I am looking to improve on this when I have the time. The scale of the assignment is somewhat large so only the interesting or difficult code implementation will be elaborated.[/p]
+[br]
+
+[p]The MapView and UIPickerView were explored in the previous assignments and will not be explained here. The TabBarController holds two separate view controllers, a Map View displaying all the annotations of the users added to the server, and a Table View which also shows the users but in a list. Each cell of the table view displays the user's nickname, year he or she started SDSU, and the city, state, and country of origin. The user can click "Filter" which will bring up switch controls and picker views to choose the country and/or year to filter the user data. The user can also click "Add User" which will navigate the user to a form to fill out. On the form, the city, state, and country can be filled out manually or the user can click "Choose Hometown" which naviates to a map in which the location can be pinned. Clicking done will submit the data to the server.[/p]
+[br]
+
+[h3][color=#00796B]UserModel.swift[/color][/h3]
+[p]Outlines the User object which will have properties for the nickname, password, country, state, city, year, and the latitude and longitude.[/p]
+[br]
+
+[h4]<span class="applicable_files">MapViewController.swift</span> and <span class="applicable_files">ListUsersViewController.swift</span>[/h4]
+[p]<span class="definition">Concurrency</span>: long-running tasks shouldn't be performed on the UI thread and at the same time, UI widgets or views should not be updated on the non-UI thread (the background). The following lists some ways to achieve concurrency.[/p]
+[list]
+    [*]<span class="definition">Threads</span> - <span class="code_method">performSelector(inBackground:)</span> and <span class="code_method">performSelector(inMainThread:)</span>[/*]
+    [*]<span class="definition">Dispatch Queues</span> - instantiate <span class="code_CS646">DispatchQueue</span> object and call async[/*]
+    [*]<span class="definition">Operation Queues</span> - executes <span class="definition">operations</span> which can be run at the same time. Operations run on a separate thread. To start the operation, add it to the queue. Can create <span class="definition">dependencies</span> so that an operation depends on the completion of other operations before it can run.[/*]
+[/list]
+[br]
+
+[p]Aside from displaying the data in a different way by adopting different protocols and implementing them, both controllers need to connect to the server and retrieve user data. The following are methods created to retrieve this data.[/p]
+[br]
+
+[list]
+    [*]<span class="code_method">retrieveDataFromServer()</span> - builds the URL with the appropriate parameters depending on the filter options the user had set. A block operation is added to the queue which runs code on another thread.[/*]
+    [br]
+    [*]<span class="code_method">getUsersFromServer()</span> takes the URL string that was built and initializes the <span class="code_CS646">URL object</span>, sets the <span class="code_CS646">HTTP</span> method to GET and the value for the header as "text/plain" and "Content-Type". Here, the request is sent to the server which will send back a response. For networking, the <span class="code_CS646">URLSession</span> shared instance is grabbed and the <span class="code_CS646">dataTask()</span> method called which takes the request and the completion handler.[/*]
+    [br]
+    [*]<span class="code_method">getUsersFromServerHandler()</span> checks that data is not nil and that the HTTP status code is 200 before deserializing the JSON object into an array. On the main queue, the <span class="code_CS646">userData</span> property is set to this deserialized array and either the annotations are reloaded for the MapViewController or the table data is reloaded for the ListUsersViewController.[/*]
+[/list]
+[br]
+
+<pre><code class="language-swift">
+/* A way to organize the following code would be to put this block
+in a method for code resuability */
+/*====================================*/
+let mainQueue = OperationQueue.main
+mainQueue.addOperation {
+    self.retrievingData = false
+}
+/*====================================*/
+
+func retrieveDataFromServer() {
+    retrievingData = true
+
+    var urlString = ""
+    switch currentFilterParameter {
+        case .ALL:
+        urlString = "https://bismarck.sdsu.edu/hometown/users"
+        case .COUNTRY:
+        urlString = "https://bismarck.sdsu.edu/hometown/users?country=\(countryFilter)"
+        case .YEAR:
+        urlString = "https://bismarck.sdsu.edu/hometown/users?year=\(yearFilter)"
+        case .COUNTRY_AND_YEAR:
+        urlString = "https://bismarck.sdsu.edu/hometown/users?country=\(coutnryFilter)&amp;year=\(yearFilter)"
+    }
+
+    let operation = BlockOperation.init(block: {self.getUsersFromServer(urlString: urlString)})
+    let queue = OperationQueue.init()
+    queue.addOperation(operation)
+}
+
+func getUsersFromServer(urlString: String) {
+    if let url = URL.init(string: urlString) {
+        var urlUsersRequest= URLRequest.init(url: url)
+        urlUsersRequest.httpMethod = "GET"
+        urlUsersRequest.setValue("text/plain", forHTTPHeaderField: "Content-Type")
+        let session = URLSession.shared
+        let task = session.dataTask(with: urlUsersRequest, completionHandler: getUsersFromServerHandler)
+        task.resume()
+    }
+    else {
+        let mainQueue = OperationQueue.main
+        mainQueue.addOperation {
+            self.retrievingData = false
+        }
+    }
+}
+
+func getUsersFromServerHandler(data: Data?, response: URLResponse?, error: Error?) -&gt; Void {
+    guard (error == nil) else {
+        print(error!.localizedDescription)
+        let mainQueue = OperationQueue.main
+        mainQueue.addOperation {
+            self.retrievingData = false
+        }
+        return
+    }
+    let httpResponse = response as? HTTPURLResponse
+    let status: Int = httpResponse!.statusCode
+
+    guard (data != nil) && (status == 200) else {
+        let mainQueue = OperationQueue.main
+        mainQueue.addOperation {
+            self.retrievingData = false
+        }
+        return
+    }
+
+    do {
+        let json: Any = try JSONSerialization.jsonObject(with: data!)
+        let jsonNSArray = json as! NSArray
+
+        let mainQueue = OperationQueue.main
+        mainQueue.addOperation {
+            self.usersData = jsonNSArray as! Array&lt;Dictionary&lt;String, Any&gt;&gt;
+
+            // If in MapViewController
+            self.reloadAnnotations()
+            // If in ListUsersViewController
+            self.listTableView.reloadData()
+
+            self.retrievingData = false;
+        }
+    }
+    catch {
+        let mainQueue = OperationQueue.main
+        mainQueue.addOperation {
+            self.retrievingData = false
+        }
+    }
+}
+</code></pre>
+[br]
+
+<div class="mobile-image-wrapper-double">
+    <div>
+        [p]The Map View that displays the locations or origin of all the users.[/p]
+        [img]/projectdetailimages/cs646_project5_mapview.gif[/img]
+    </div>
+    <div>
+        [p]An example of filtering the list of users by country. The map view will refresh to show only the relevant annotations and will center on the users.[/p]
+        [img]/projectdetailimages/cs646_project5_mapfilter.gif[/img]
+    </div>
+</div>
+[br]
+<hr>
+[br]
+<div class="mobile-image-wrapper-double">
+    <div>
+        [p]The Table View that displays the nickname, year admitted into SDSU, the city, state, and country of each user on the server.[/p]
+        [img]/projectdetailimages/cs646_project5_tableview.gif[/img]
+    </div>
+    <div>
+        [p]An example of filtering the list of users by year. The table view is refreshed to show the relevant users that match the conditions.[/p]
+        [img]/projectdetailimages/cs646_project5_tablefilter.gif[/img]
+    </div>
+</div>
+[br]
+
+[h3][color=#00796B]AddUserViewController.swift[/color][/h3]
+[p]If there is a validation error in the input, the border around the input field will be colored red and an AlertViewController is used to pop up the error message. The validation functions in this form are <span class="code_method">validateData()</span>, <span class="code_method">chooseHometownValidation()</span>, and <span class="code_method">checkValidCity()</span>. Within this controller, there are methods that are called to both retrieve the user data and to post the user data. The reason as to why a request is sent using the GET HTTP method is to check if the nickname the user entered already exists in the server. The code to send this request and execute further code in the completion handler is similar to the code block above. For POST, the request is written similarly but the HTTP method should be set to "post" and setValue() should take in "application/json" as the content-type instead of "text/plain". The JSON string should be built using the user's inputs, which represents the new record to add.[/p]
+[br]
+
+<pre><code class="language-swift">
+func postDataToServer)() {
+    guard let nicknameText = nicknameTextField.text, let password = passwordTextField.text,
+    let country = countryButton.currentTitle, let state = stateButton.currentTitle, let city = cityTextField.text,
+    let year = yearButton.currentTitle, let yearInt = Int(year) else {
+        isNetworking = false;
+        return
+    }
+
+    let nickname = nicknameText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    let jsonRecordString = "{\"nickname\":\"\(nickname)\",\"password\":\"\(password)\",\"country\":\"\(country)\",
+    \"state\":\"\(state)\",\"city\":\"\(city)\",\"year\":\(yearInt)}"
+    let jsonRecord: Data? = jsonRecordString.data(using: .utf8)
+
+    let operation = BlockOperation.init(block: { self.postUser(jsonRecord: jsonRecord) })
+    let queue = OperationQueue.init()
+    queue.addOperation(operation)
+}
+
+func postUser(jsonRecord: Data?) {
+    if let url = URL.init(string: "https://bismarck.sdsu.edu/hometown/adduser") {
+        var urlPostUserRequest = URLRequest.init(url: url)
+        urlPostUserRequest.httpMethod = "POST"
+        urlPostUserRequest.httpBody = jsonRecord
+        urlPostUserRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let session = URLSession.shared
+        let task = session.uploadTask(with: urlPostUserRequest, from: jsonRecord, completionHandler: postUserHandler)
+        task.resume()
+    }
+    else {
+        let mainQueue = OperationQueue.main
+        mainQueue.addOperation({
+            self.isNetworking = false
+        })
+    }
+}
+
+func postUserHandler(data: Data?, response: URLResponse?, error: Error?) -&gt; Void {
+    guard (error == nil) else {
+        let mainQueue = OperationQueue.main
+        mainQueue.addOperation({
+            self.isNetworking = false
+        })
+        return
+    }
+
+    let httpResponse = response as? HTTPURLResponse
+    let status: Int = httpResponse!.statusCode
+
+    guard (status == 200) else {
+        let statusError = String(data: data!, encoding: String.Encoding.utf8)
+        print("\(statusError ?? "some status error") and statusCode: \(status)")
+        let mainQueue = OperationQueue.main
+        mainQueue.addOperation({
+            self.isNetworking = false
+        })
+        return
+    }
+
+    let mainQueue = OperationQueue.main
+    mainQueue.addOperation({
+        self.isNetworking = false
+        if (self.currentSource == .MAP) {
+            self.currentSource = .NONE
+            self.posted = true
+            self.performSegue(withIdentifier: self.unwindToMapSegue, sender: self)
+        }
+        else if (self.currentSource == .LIST_USERS) {
+            self.currentSource = .NONE
+            self.posted = true
+            self.performSegue(withIdentifier: self.unwindToListUsersSegue, sender: self)
+        }
+    })
+}
+</code></pre>
+[br]
+
+<div class="mobile-image-wrapper-double">
+    <div>
+        [p]The form that the user must fill out to add new users.[/p]
+        [img]/projectdetailimages/cs646_project5_adduserform.png[/img]
+    </div>
+    <div>
+        [p]Tapping either country, state, or year will bring up a UIPickerView. Tapping country or state will require the view controller to send a request to the server to retrieve the list of acceptable countries or states. The data for the year is a range of numbers from 1970 to 2017.[/p]
+        [img]/projectdetailimages/cs646_project5_adduserformdatapicker.gif[/img]
+    </div>
+</div>
+[br]
+
+[h3][color=#00796B]ChooseHometownViewController.swift[/color][/h3]
+[p]As with the form, clicking the done button will post the user's information in the form of a request to the server. Thus, the code to construct the JSON object in a string, add an operation to the queue on a separate thread, create the URL request, and specify the handler once there is a response from the server, are similar. However, what's different about hsi view controller is that the location and coordinates that the user clicked and pinned on the map must be reversed-geocoded so that the city, state, and country can be correctly sent to the server. Since we don't want coordinate data to be sent, reverse geocoding is done to send the data in the correct form.[/p]
+[br]
+
+<pre><code class="language-swift">
+func reverseGeocodeCoordinates() {
+    guard let coordinates = userCoordinates else {
+        isNetworking = false
+        return
+    }
+    let location = CLLocation.init(latitude: coordinates.latitude, longitude: coordinates.longitude)
+    let locator = CLGeocoder()
+    locator.reverseGeocodeLocation(location) { (placemarks, errors) in
+        if let place = placemarks?[0] {
+            self.userCity = place.locality
+            self.userCountry = place.country
+
+            if (place.country == "United States") {
+              self.userState = UnabbreviatedStateOrProvidence.returnUnabbreviated(country: "United States",
+                administrativeArea: place.administrativeArea)
+              self.userCountry = "USA"
+            }
+            else if (place.country == "Mexico") {
+              self.userState = UnabbreviatedStateOrProvidence.returnUnabbreviated(country: "Mexico",
+                administrativeArea: place.administrativeArea)
+            }
+            else {
+              self.userState = place.administrativeArea
+            }
+            self.postDataToServer()
+        }
+        else {
+            self.isNetworking = false
+        }
+    }
+}
+</code></pre>
+[br]
+
+[p]An alternative to filling out the entire form is to tap on "Choose Hometown from Map" after filling out the nickname, password, and year. The example shows that a location is pinned and "done" is tapped to submit the new information to the server. This then takes the user back to the map view or the table view and refreshes the annotations or the list of users.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs646_project5_choosehometown.gif[/img]
+</div>

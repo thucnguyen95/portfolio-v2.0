@@ -1,0 +1,77 @@
+[h2]Assignment[/h2]
+[p][b]Convert[/b][/p]
+[p]Create an app that converts USD to INR and INR to USD. Use the rate 1 INR = 0.016 USD and 1 USD = 63.89 INR. The user can enter either INR or USD. When they press the Convert button the amount gets converted into the other currency.[/p]
+[br]
+
+[p]Create two layouts for the activity, one landscape and one portrait. The layout for each view is shown below. Note that the order of the text views and button are different in the two different views. Match those views. When the user rotates the device, the amounts remain in the fields.[/p]
+[br]
+
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project1_orientations.png[/img]
+</div>
+[br]
+
+[p]When you create your project set the minimum required SDK to API 19 (Android 4.4 KitKat). All non-numeric text displayed on the screen should be in the strings resource file. The user should only be able to enter decimal values in the fields. When the device is rotated, the correct amounts should still be displayed in the edit text fields. When the amounts are converted, the resulting values should display two decimal values.[/p]
+[br]
+
+[h2]Implementation Details[/h2]
+[p]In order to lay out the buttons and edit text fields in the desired positions, separate layout XML files had to be created, one for the portrait orientation and the other for landscape. Under resources, a directory called [b]"layout-land"[/b] was conventionally named to be associated with the [b]"layout"[/b] directory. The name of the layout files under each of these directories had to be the same in order for the correct layout to display on orientation change.[/p]
+[br]
+
+<div class="mobile-image-wrapper-double">
+    <div>
+        [p]The application in portrait mode.[/p]
+        [img]/projectdetailimages/cs64601_project1_portrait.png[/img]
+    </div>
+    <div>
+        [p]The application in landscape mode.[/p]
+        [img]/projectdetailimages/cs64601_project1_landscape.png[/img]
+    </div>
+</div>
+[br]
+
+[h3][color="#00796B"]ConvertActivity.java[/color][/h3]
+[p]An enum called [color=#4169e1]FocusedEditText[/color] was declared and the property [color=#4169e1]currentFocusedEditText[/color] was instantiated to [color=#4169e1].NONE[/color]. The property is used to mark which edit text field the user just tapped on, or is in focus. This allows the unfocused text field to be cleared of text to make it more clear to the user which currency is being converted.[/p]
+[br]
+
+<pre><code class="language-java">
+private FocusedEditText currentFocusedEditText = FocusedEditText.NONE;
+
+private enum FocusedEditText {
+    USD,
+    INR,
+    NONE
+}
+</code></pre>
+[br]
+
+[list]
+    [*][color=#800000]initializeWidgets()[/color] - calls [color=#4169e1]this.findViewById()[/color] to get a reference to the widgets in Resources. Also sets the click and focus listeners on the button and edit text fields.[/*]
+    [br]
+    [*][color=#800000]convertInputValue()[/color] - takes the value of the currently focused edit text field, converts it to a float, and calculates the new amount converted to the other currency. Something interesting to note was that a formatted string with the proper locale had to be used to set the edit text field.[/*]
+    [br]
+[/list]
+<pre><code class="language-java">
+useEditText.setText(String.format(Locale.US, "%.2f", (usdInputValue * usdRate)));
+</code></pre>
+[br]
+
+[h3]Implementing Listeners[/h3]
+[list]
+    [*][color=#800000]onClick()[/color] - if the convert button was clicked, [color=#800000]convertInputValue()[/color] was fired.[/*]
+    [br]
+    [*][color=#800000]onFocusChange()[/color] - whenever an edit text field was focused on by the tap of the user, the [color=#4169e1]currentFocusedEditText[/color] property was updated and the text of the unfocused field was set to an empty string.[/*]
+[/list]
+[br]
+
+[h3]Temporarily Saving the Text of the Edit Text Fields[/h3]
+[list]
+    [*][color=#800000]onSaveInstanceState()[/color] - puts the strings from both the USD and INR edit text fields into the bundle.[/*]
+    [br]
+    [*][color=#800000]onRestoreInstanceState()[/color] - retrieves the strings using the appropriate keys and sets those values as the text to the edit text fields.[/*]
+[/list]
+[br]
+
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project1_preview.gif[/img]
+</div>

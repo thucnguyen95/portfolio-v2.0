@@ -1,0 +1,287 @@
+[h2]Assignment Details[/h2]
+[p]Deployment is done by placing all files in the /war directory onto the top level in gwtxxx folder on jadran. Application would be accessed at http://jadran.sdsu.edu/gwtxxx/Whiteboard.html (unavailable).[/p]
+[br]
+
+[h3]Assignment[/h3]
+[p]For this assignment, you will develop an online white board application using the Google Web Toolkit. All parts of this project should be created within the Google Web Toolkit. This application is designed to allow users to have an online editable writing space where they can note important reminders, or keep a to-do list, or communicate with others.[/p]
+[br]
+
+[h3]Details[/h3]
+[p]Since the application is online, it must be protected. You must start with a login screen to authenticate the user. There is no need to add user login management functionality; nor do you really need a username/password. Just a password will be sufficient to keep unauthorized troublemakers out, as the security requirements are minimal. One login password must be:[/p]
+[list]
+    [*]password: sp2018[/*]
+[/list]
+[br]
+
+[p]Your application will display a page where users may add, edit/modify, or delete any text. The page contents (data) must be stored on the jadran server, and must be persistent. Should the server crash, or be rebooted, no data should be lost. Thus, you will have to commit any changes in the data to disk on the server. Thus, the minimum specifications require a single editable page. You should have two buttons: SAVE and RELOAD.[/p]
+[br]
+
+[p]Since the application is multi-user, you should synchronize any critical sections to prevent corruption.[/p]
+[br]
+
+[h2]Additional Notes[/h2]
+[p][b]Note[/b]: the code was written by [b]Professor Riggins[/b] and there were only a few changes I made to the code, including the following:[/p]
+[list]
+    [*]Changes made in the CSS[/*]
+    [*]Customizing the RichTextArea and buttons by using a FlowPanel that has its CSS properties set to act like a horizontal panel. HorizontalPanel class wasn't used because width of the children couldn't be specified.[/*]
+[/list]
+[br]
+
+[p]Because of this, the code will be unavailable on my Github, and I will only show snippets of the code on this page.[/p]
+[br]
+
+[p]References for this application include the <a href="http://www.gwtproject.org/doc/latest/RefWidgetGallery.html">GWT Widget Gallery</a>, and the <a href="http://www.gwtproject.org/javadoc/latest/index.html">GWT API</a>.[/p]
+[br]
+
+[p][color=#664C90]GWT[/color]: an integrated client-to-server solution in which code is written in Java. The client-side uses Javascript, which is cross-compiled from Java. On the server-side, servlets are used but they do not need to be manually deployed.[/p]
+[br]
+
+[p]Some advantages that GWT offers:[/p]
+[list]
+    [*]A closed system in which everything is written in Java - not HTML, CSS, or JS. However, an exception is CSS because it can be used to style GWT widgets.[/*]
+    [*]Differences seen across browsers diminishes. GWT works nicely on different kinds of browsers because it generates multiple versions of the code for those browsers.[/*]
+[/list]
+[br]
+
+[p]Some disadvantages include:[/p]
+[list]
+    [*]Porting to another system is not trivial.[/*]
+    [*]When making changes, the developer must go back to the code base, load the system, recompile, and redeploy. So he/she must go through the entire development process again.[/*]
+[/list]
+[br]
+
+[p]GWT attempts to[/p]
+[list]
+    [*]Handle overloading the client side with JS.[/*]
+    [*]Handle AJAX in another way.[/*]
+    [*]Solve or side-step serialization. JSON isn't needed. Developer can use same platform for both the client and the server.[/*]
+[/list]
+[br]
+
+[p][color=#664C90]Remote Procedure Calls[/color]: calling a method on the client when the code is actually on the server. The caller is the client, the executor is the server.[/p]
+[br]
+
+[p]Before starting the project, the <a href="http://www.gwtproject.org/download.html">GWT SDK</a> and <a href="https://ant.apache.org/">ANT</a> program were downloaded and installed.[/p]
+[br]
+
+[p][color=#664C90]ANT[/color]: a tool for building Java projects, a make utility which recompiles source files and redeploys it using a build file (build.xml). Commands -[/p]
+[list]
+    [*][b]ant clean[/b]: remove all compiled files[/*]
+    [*][b]ant build[/b]: build and compiles the files[/*]
+    [*][b]ant devmode[/b]: development mode, initiates mini environment on computer[/*]
+[/list]
+[p][color=#664C90]Jetty[/color]: development environment which uses your browser but runs a web server on the local machine. Essentially a local server.[/p]
+[list]
+    [*]To deploy, transfer files from war directory to server. [/*]
+    [*]Change permissions of any files on the server that is being written to.[/*]
+[/list]
+
+[h2]Project Details[/h2]
+[p][b]Note[/b]: the code was written by [b]Professor Riggins[/b]. This is an explanation of that written code and of how the assignment was completed.[/p]
+[br]
+
+[h3]Login Panel[/h3]
+[p]Since this application was designed as a single-page application, visiting the page or refreshing it will always require authentication via password.[/p]
+[br]
+
+[p][color=#00796B]Whiteboard.java[/color][/p]
+[p]As noted by implementing [color=#e58a18]EntryPoint[/color], this file is the entry point into the application and [color=#800000]onModuleLoad()[/color] is analogous to the main() method in Java.[/p]
+[br]
+
+[p]Import any packages required to use the GWT widgets and the AsyncCallback.[/p]
+[br]
+<pre><code class="language-java">
+package edu.sdsu.cs645.client;
+
+import com.google.gwt.core.client.*;
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+...
+</code></pre>
+[br]
+
+[p]Class Level Variables.[/p]
+<pre><code class="language-java">
+public class Whiteboard implements EntryPoint {
+
+    private final WhiteboardServiceAsync whiteboardService = GWT.create(WhiteboardService.class);
+    private HTML status;
+    private RichTextArea board;
+}
+</code></pre>
+[br]
+
+[list]
+    [*]Creating a [color=#e58a18]WhiteboardServiceAsync[/color] object allows for communication with the server.[/*]
+    [*]The status, an [color=#e58a18]HTML[/color] object, is used to inform the user.[/*]
+    [*]The [color=#e58a18]RichTextArea[/color] object will hold the content, or anything that will be read from or written to a text file.[/*]
+[/list]
+[br]
+
+[p][color=#800000]onModuleLoad()[/color] - initialize the status HTML object and set any class names to style it, then call [color=#800000]buildLogin()[/color].[/p]
+[br]
+
+<pre><code class="language-java">
+public void onModuleLoad() {
+    status = new HTML();
+    status.getElement().setId("status_message");
+    buildLogin();
+}
+</code></pre>
+[br]
+
+[p][color=#800000]buildLogin()[/color] - builds the login panel by using Flow Panels. Sets any class names or id attributes for styling. Add a label and the [color=#e58a18]PasswordTextBox[/color] to a [color=#e58a18]FlowPanel[/color], the clear and login buttons to another FlowPanel. Add the click handlers for the login and clear button. Clicking clear will empty the text in the PasswordTextBox, while clicking login will call [color=#800000]validateLogin()[/color]. Add the FlowPanels to the [color=#e58a18]RootPanel[/color].[/p]
+[br]
+
+<pre><code class="language-java">
+private void buildLogin() {
+    FlowPanel loginPanel = new FlowPanel();
+    FlowPanel passwordPanel = new FlowPanel();
+
+    final PasswordTextBox password = new PasswordTextBox();
+    passwordPanel.add(password);
+
+    ...
+
+    Button loginButton = new Button();
+    Button clearButton = new Button();
+
+    loginButton.addClickHandler(new ClickHandler(){
+        public void onClick(ClickEvent e) {
+            validateLogin(password.getText());
+        }
+    });
+    clearButton.addClickHandler(new ClickHandler(){
+        public void onClick(ClickEvent e) {
+            status.setText("");
+            password.setText("");
+        }
+    });
+
+    ...
+
+    RootPanel.get().add(loginPanel);
+}
+</code></pre>
+[br]
+
+[p][color=#800000]validateLogin()[/color] - initializes a new [color=#e58a18]AsyncCallback[/color] object which in onSuccess() will clear the status and call [color=#800000]buildWhiteboard()[/color] while in onFailure(), will set the error message to the status and print the stack trace. [color=#800000]validateLogin()[/color] of the WhiteboardServiceAsync remote service object will then be fired, passing in the arguments for the login password the user had typed in and the callback that was just created.[/p]
+[br]
+
+<pre><code class="language-java">
+private void validateLogin(String login) {
+    AsyncCallback callback = new AsyncCallback() {
+        public void onSuccess(Object results) {
+            String answer = (String) results;
+            if (answer.equals("OK")) {
+                buildWhiteboard();
+            }
+        }
+        public void onFailure(Throwable error) {
+            error.printStackTrace();
+        };
+    };
+    whiteboardService.validateLogin(login, callback);
+}
+</code></pre>
+[br]
+
+[p][color=#00796B]WhiteboardService.java[/color][/p]
+[p]An interface wherein each method declared will specify the type of argument it takes, if any, and the String object to be returned. This is usually the place to declare the methods for any AJAX-like called (though this file is the synchronous version).[/p]
+[br]
+
+<pre><code class="language-java">
+@RemoteServiceRelativePath("whiteboard")
+public interface WhiteboardService extends RemoteService {
+    String validateLogin(String name) throws IllegalArgumentException;
+    ...
+}
+</code></pre>
+[br]
+
+[p][color=#00796B]WhiteboardServiceAsync.java[/color][/p]
+[p]The actual asynchronous version of [color=#00796B]WhiteboardService.java[/color]. Declared methods must return void, and the arguments are specified as needed although the AsyncCallback object must be included.[/p]
+[br]
+<pre><code class="language-java">
+public interface WhiteboardServiceAsync {
+    void validateLogin(String input, AsyncCallback&lt;String&gt; callback)
+        throws IllegalArgumentException;
+    ...
+}
+</code></pre>
+[br]
+
+[p][color=#00796B]WhiteboardServiceImpl.java[/color][/p]
+[p]The file in which to implement the declared interface methods. [color=#800000]validateLogin()[/color] checks to see if the input String simply equals "sp2018" as only 1 password is allowed, and returns "OK" if there is a match and "INVALID" if there isn't.[/p]
+[br]
+
+<pre><code class="language-java">
+public class WhiteboardServiceImpl extends RemoteServiceServlet implements
+    WhiteboardService {
+
+    public String validateLogin(String input) throws IllegalArgumentException {
+        if (input.equals("sp2018")) {
+            return "OK";
+        }
+        return "INVALID";
+    }
+}
+</code></pre>
+[br]
+
+[p]The following shows how a user would login to the application.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project3_login.gif[/img]
+[br]
+
+[h3]Whiteboard Panel[/h3]
+[p][color=#00796B]Whiteboard.java[/color][/p]
+[p][color=#800000]buildWhiteboard()[/color] - layout the page by using FlowPanels and styling the CSS. Add the title, the RichTextArea, the button panels (by calling [color=#800000]getButtonPanel()[/color]), and the status to a FlowPanel. Clear the RootPanel and then add that new FlowPanel. Call [color=#800000]loadPanel()[/color].[/p]
+[br]
+
+[p][color=#800000]getButtonPanel()[/color] - sets up the clear, load, and save buttons as well as set the click handlers for them:[/p]
+[list]
+    [*][b]clear[/b] - removes the text in the RichTextArea and the status[/*]
+    [*][b]load[/b] - calls loadPanel()[/*]
+    [*][b]save[/b] - calls savePanel()[/*]
+[/list]
+[br]
+
+[p][color=#800000]savePanel()[/color] - similar to [color=#800000]validateLogin()[/color] in that this method creates a new AsyncCallback object and calls [color=#800000]save()[/color] on the WhiteboardServiceAsync object. If "OK" is returned, display success message in status, else display the error message[/p]
+[br]
+
+[p][color=#800000]loadPanel()[/color] - similar to [color=#800000]valdiateLogin()[/color] in that this method creates a new AsyncCallback object and calls [color=#800000]load()[/color] on the WhiteboardServiceAsync object. The onSuccess() parameter is the content that was saved, and so the RichTextArea has its HTML set to this.[/p]
+[br]
+
+[p][color=#00796B]WhiteboardServiceImpl.java[/color][/p]
+[p]The following is a snippet of writing to a file named "data.txt" on the server, which acts as a way to persist data. The Servlet context is retrieved to get the path before appending the String "data.txt" to it.[/p]
+[br]
+
+<pre><code class="language-java">
+String path = getServletContext().getRealPath("/");
+String fileName = path + "/data.txt";
+try {
+    PrintWriter out = new PrintWriter(new FileWriter(filename));
+    // contents is the parameter passed in
+    out.print(contents);
+    out.close();
+} catch(Exception error) {
+    return "ERROR";
+}
+return "OK";
+</code></pre>
+[br]
+
+[p]Reading the file when the user clicks the load button triggers code similar to writing in the contents to the data file, except that a BufferedReader object is used to read in each line of the file.[/p]
+[br]
+
+<!-- [gif] Example of clearing RichTextArea -->
+[p]The following shows the text in the RichTextArea being cleared.[/p]
+[img]/projectdetailimages/cs645_project3_clear.gif[/img]
+[br]
+
+<!-- [gif] Example of Saving the text, clearing, and Loading -->
+[p]The following shows saving the contents to disk, clearing the content, and loading the content from disk back onto the RichTextArea.[/p]
+[img]/projectdetailimages/cs645_project3_saveclearload.gif[/img]
+[br]
