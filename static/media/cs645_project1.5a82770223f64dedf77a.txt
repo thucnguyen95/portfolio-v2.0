@@ -1,0 +1,442 @@
+[h2]Assignment Details[/h2]
+[h3]Appendum[/h3]
+[p]When the user logs out, a new page must be displayed. This cannot be a Single-Page Application (SPA). The confirmation for normal add/edit/delete may be displayed on the same page, but the confirmation of logout must be displayed on a separate page.[/p]
+[br]
+[p]The entry point for your project is a file called index.html. The first page of your project (the login screen) will be displayed if the user directs the browser to http://jadran.sdsu.edu/~jadrnxxx/proj1[/p]
+[br]
+
+[h3]Assignment[/h3]
+[p]This assignment is designed to review and reinforce fundamental principles of dynamic programming. The tools you may use for this project are: Perl (mod_perl only), xhtml/html 5, CSS 3, Javascript, AJAX, and the MySQL database on opatija. You may use JQuery, and Bootstrap if you wish. For this project, you must use Perl for all scripts.[/p]
+[br]
+
+[p]Additionally, there is a new set of skills to learn: state management. Since the TCP/IP protocol is stateless you must manage proper authentication protocols. All content of your site must be protected from unauthorized access.[/p]
+[br]
+
+[p]This assignment reinforces basic web app development skills and adds some new material:[/p]
+[list]
+    [*]State Management[/*]
+    [*]Sessions and Cookies[/*]
+    [*]Encryption[/*]
+    [*]Data Serialization[/*]
+[/list]
+[br]
+
+[p]You will create an [b]online store selling some type of merchandise[/b]. The type of products you choose to sell is entirely up to you. Some suggestions:[/p]
+[list]
+    [*]cameras[/*]
+    [*]shoes[/*]
+    [*]clothing[/*]
+    [*]jewelry[/*]
+    [*]DVDs[/*]
+    [*]software[/*]
+    [*]food products[/*]
+[/list]
+[br]
+
+[p]Give some thought to your choice; you will be creating an additional project using this online retail model. You should design an attractive and appealing theme or Look and Feel for your project.[/p]
+[br]
+[p]For this first assignment you will create a portion of an inventory application for your online retail site. This portion is an application that will allow an authorized company employee to create inventory records for new products that the retailer will sell. The application consists of the following:[/p]
+[list]
+    [*][b]A login screen[/b]. The user must supply an authorized username/password pair to gain access to the system.[/*]
+    [*][p][b]Menu page[/b]. Once login succeeds, the user will be presented with a page that gives choices to:[/p]
+    [br]
+        [p]New Inventory Record - add a new record[/p]
+        [p]Edit Inventory Record - change some or all of an existing record[/p]
+        [p]Delete Inventory Record - remove a record from the system[/p]
+        [p]Log out of the system[/p]
+    [/*]
+    [br]
+    Rather than a blank page with four links, load the New Inventory Record page as the default, with links clearly available for the other choices (tabs are a good choice here).[/*]
+    [*][b]Confirmation[/b]. After any of the above actions, you must display a confirmation, recapping the information just submitted, along with a message that the submission was successful (or not as the case may be). This may be a new page, or you may use AJAX to display the information in the existing page.[/*]
+[/list]
+[br]
+
+[h3]The Details[/h3]
+[h4][b]The Login Screen[/b][/h4]
+[p]Present the user with two fields, the <i>username</i> and <i>password</i>. The form should also have a clear and a submit button. If the user enters a valid username/password, the Menu page will load. If the login is invalid, then the login screen should reappear, along with a helpful error message. [<i>Use the label 'clear' for the reset button</i>][/p]
+[br]
+[p]Username/password pairs should be stored in a text file on the server ([b]not[/b] in the MySQL database). The username should be stored in plain text, and the password should be stored in an encrypted form. You may [b]not[/b] hardcode any username/password pairs in your Perl code. You must have at least five valid username/password pairs, one of which must be:[/p]
+[br]
+[p]username: cs645[/p]
+[p]password: sp2018[/p]
+[br]
+[p]You must use POST as the parameter passing method. Use Javascript to place the cursor on the username field when the page loads. Simple things can mean a lot for useability. The user should not have to grab the mouse and manually give focus to the username field.[/p]
+[br]
+[p]You must save state. Access to the add/edit/delete portion of the system can only be allowed for authorized users. Note that it is not sufficient to display the add/edit/delete page on successful login. You must validate the user on submission of data, for [b]every[/b] subsequent submission. Moreover, you must ensure that if a user has logged out the protected portion is not accessible via the back button or direct entry of a URL in the address bar. This is a key requirement for the assignment, and failure in this area will mean a serious grade reduction.[/p]
+[br]
+
+[h4]The New Inventory Item Screen[/h4]
+[p]This is the form for adding a new item to the online store's inventory. New items must be stored in the MySQL database on opatija.sdsu.edu. For this project you will create tables with the following fields, all of which are [b]required[/b], not optional. <i>This means that the user must provide this information when entering an inventory record</i>:[/p]
+[br]
+[list]
+    [*][b]SKU[/b] The stock number. This is a seven digit string, with three capital letters, followed by a dash, followed by a three digit number. Examples: ARC-001, ZZF-992 etc. This will be the primary key in the inventory table, and as such it must be distinct (no duplicates). <i>Retailers generally use a proprietary code to identify each item they sell. The code is meaningful only to the retailer. Example: item number at Costco</i>[/*]
+    [*][b]Category[/b] Almost all types of products need a category. For example, camera categories might be: DSLR, Point and Shoot, Underwater/weather-proof, film etc. <i>Some types of products may need subcategories. Add this if you need to. Example: Shoes, dress, casual, walking, athletic, and these categories may be valid for men, women, or children</i>.[/*]
+    [*][b]Vendor[/b] The name of manufacturer or brand of the item.[/*]
+    [*][b]Manufacturer's Identifier[/b] Mandatory field. This is either a name or item number used by the manufacturer to identify the product.[/*]
+    [*][b]Description[/b] A short description of the item.[/*]
+    [*][b]Features[/b] A longer, fuller discription of the item.[/*]
+    [*][b]Cost[/b] Currency format, this is the price the retailer pays the manufacturer for the product. Note, the $ symbol should not be used with the cost.[/*]
+    [*][b]Retail[/b] Currency format, the retail price that customers will pay for the product. [ <i>You will need to add inventory items for project submission. Please select reasonable values for the cost and retail prices. Set the retail price about 25% above cost.</i> ][/*]
+    [*][b]Quantity[/b] [<i>note that the quantity must be >= 0</i>].[/*]
+    [*][b]Product Image[/b] An image of the new inventory item which must be uploaded. Store the filename along with the rest of the fields in the form in the MySQL database, but store the actual image file in a folder on the server.[/*]
+[/list]
+[br]
+
+[p]The following is an example record:[/p]
+[br]
+<pre>
+SKU:    WEH-094
+Vendor: Nikon
+Manufacturer's Identifier:  D5
+Description:  The new flagship of Nikon's D-SLR lineup: D5. Engineered for
+            professionals, D5 strikes an ideal balance between resolution, sensor
+            size, image processing and ISO range.
+Features:
+            FX full frame format
+            20.8 megapixels
+            12 FPS continuous shooting
+            ISO range 100-102, 400 (expandable to 3,280,000)
+            Redesigned AF system with 153 focus points
+            3.2" Clear View LCD 4K screen
+Cost: 4852.50
+Retail: 6499.95
+Quantity: 24
+Product Image: d5_camera.png
+</pre>
+[br]
+
+[p]You must use Javascript to validate the form. As much as possible, your Javascript should help the user enter correct information. Think carefully about how you implement the validation. Be sure to use Javascript to put focus on the first field when the page loads.[/p]
+[br]
+
+[p]A note about your project database tables. Good design will require a minimum of three tables in your database: [b]product[/b], [b]category[/b], and [b]vendor[/b]. Use exactly these names in your database. You do not need to make any provision for creating/editing/deleting records from the category and vendor tables. This is an appropriate simplification. Any needed changes may be made by interacting with the database directly. This is not as uncommon as it may sound - buyers often need to submit requests to the system administrator for such actions.[/p]
+[br]
+
+[h4]Edit Inventory Page[/h4]
+[p]This screen allows the store to change any field in the form except for the SKU. You should allow the user to search for a record to modify, using the SKU field only. Populate the form with the existing data, which the buyer may change and save. Once an edit has been completed, the record must validate correctly. If the user needs to change an SKU, the record must be deleted and re-added.[/p]
+[br]
+
+[h4]Delete Inventory Page[/h4]
+[p]This screen allows the buyer to delete an inventory record from the system. You should allow the buyer to search for the record to delete by SKU only. Since this is a delete operation, only the SKU field should be editable.[/p]
+[br]
+
+[h4]Confirmation Page[/h4]
+[p]Every action (add/edit/delete/logout) should result in a confirmation that displays the status of the action. If an error occurs, display a helpful error message. In any case, if you send a confirmation page, include at the top of the page a link to take the user back to the login screen or menu page as is appropriate. Note: you must insure that only authorized users have access to the system.[/p]
+[br]
+
+[h3]AJAX[/h3]
+[p]Your project must use ajax in the following ways:[/p]
+[list]
+    [*]New Inventory Item Screen, use ajax to insure that the SKU entered is not a duplicate.[/*]
+    [*]Edit/Delete Inventory Item Screen, when the user tabs off of the SKU screen, the remaining fields are automatically filled in using ajax. The user should NOT have to click on a button to accomplish this.[/*]
+[/list]
+[br]
+
+[h2]Additional Notes[/h2]
+[p]For this project, function is prioritized over looks. The user must be able to logout. If the user clicks the back button after logging out, access should be denied. Note that the server can request things from the browser but it cannot force the browser to do something. Thus, the cache made by the browser should be handled. The purpose of this project is to make credentials for logging in and out bulletproof.[/p]
+[list]
+    [*]The category and vendor are used to organize the products. Select elements with options can be used and hard-coded in the form.[/*]
+    [*]Have at least 5 usernames and passwords (do not hard-code anywhere).[/*]
+    [*]Use POST as the method to log in.[/*]
+    [*]Save state by managing the [color=#664C90]session[/color]. Every time the user sends data, the session id must be validated. Every request must be authenticated.[/*]
+[/list]
+[br]
+
+[h4]File Upload[/h4]
+[p]When adding an image file to the server, the method used must be POST and the entype attribute should be multipart/form-data. The action should refer to the CGI script. This allows image data to be sent. The full path on the server to where the file will be saved should be used.[/p]
+[br]
+
+[h4]Database[/h4]
+[p]Must have more tables in the database for this project compared to previous projects. The tables can be hard-coded and inserted into. Primary keys are needed. [color=#664C90]Foreign keys[/color], which are primary keys from another table, are also used.[/p]
+[list]
+    [*]Product table (SKU is primary key) - two foreign keys, the category and vendor number[/*]
+    [*]Vendor table (Primary key auto-incremented, is foreign key in product table)[/*]
+    [*]Category table (Primary key auto-incremented, is foreign key in product table)[/*]
+[/list]
+[br]
+
+[h2]Project Details[/h2]
+[h3]Signing In[/h3]
+[p][color=#00796B]signin.cgi[/color], [color=#00796B]index.html[/color], and [color=#00796B]error.html[/color][/p]
+[p]The landing page for the application is [color=#00796B]index.html[/color], and users are presented with two input text fields to enter their username and password. Clicking 'Sign In' will call the [color=#00796B]signin.cgi[/color] script which will authenticate users. If access is denied because the username or password was invalid, the user is returned to [color=#00796B]error.html[/color], which is laid out like the landing page but displays an error message.[/p]
+[br]
+
+[h4]Encryption[/h4]
+[p][color=#00796B]passwords.dat[/color] is a file that stores the username and encrypted passwords in pairs on each line. A perl script was made to write output out to this file. The file is created by redirecting to [color=#00796B]passwords.dat[/color], and standard input asks to enter the username and password desired. The crucial part of the code is calling the [color=#e58a18]Password[/color] module's [color=#e58a18]new()[/color] method, which takes the <i>password</i>, the <i>salt</i>, and the <i>algorithm</i> for [color=#664C90]one-way encryption[/color] of the password:[/p]
+<pre><code class="language-perl">
+use Crypt::Password;
+
+my $salt = "..."
+my ($user, $password, $encrypted_password);
+
+open OUTFILE, ">passwords.dat" or die "Cannot open file.";
+print "Enter the username and password for each entry at the prompt.\n";
+print "Hit ENTER for the username (leaving it empty) to end the script.\n\n";
+
+for (;;) {
+    print "Enter the username: ";
+    $user = &lt;STDIN&gt;;
+    chomp $user;
+    if (length($user) == 0) {
+        last;
+    }
+    print "Enter the password: ";
+    $password = &lt;STDIN&gt;;
+    chomp $password;
+    $encrypted_password = Crypt::Password->new($password, $salt, sha256);
+    print OUTFILE "$user" . "=" . $encrypted_password . "\n";
+}
+close OUTFILE;
+</code></pre>
+[br]
+
+[p]In [color=#00796B]signin.cgi[/color], the subroutine [color=#800000]authenticate()[/color] will open passwords file and for each line, split the string at the '=' separator. The username saved and the username entered is checked for equality. The passwords are checked for equality by encrypting the password the user entered and seeing if it equates to the password saved.[/p]
+[br]
+
+[p]The following is a preview of the landing page for the user to sign in.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project1_signin.png[/img]
+[br]
+
+[h3]The Inventory Tabs[/h3]
+[p][color=#00796B]menu.txt[/color] is the output to print to the browser if authentication is successful, and uses JQueryUI Tabs to display different forms to add, edit, or delete a product from the inventory. [color=#00796B]menu.js[/color] contains all the code involving validation of input fields and image files as well as AJAX calls to the scripts. The logout button will call the [color=#00796B]logout.cgi[/color] script to release the user from his/her privilege to access the app by killing the session and clobbering the cookie.[/p]
+[br]
+
+[h4]New Inventory Tab[/h4]
+[p]This tab allows the user to add a new inventory record into the database. Validation functions, called from [color=#800000]validateForm()[/color], that were used for this tab and the edit tab include the following: [color=#800000]validateSKU()[/color], [color=#800000]validateManufacturersID()[/color], [color=#800000]validateSelect()[/color], [color=#800000]validateTextarea()[/color], [color=#800000]validateCostRetailQuantity()[/color], and [color=#800000]validateProductImage()[/color].[/p]
+[list]
+    [*]Each of these functions check that the required fields aren't empty.[/*]
+    [*]Some functions use a regex to check if the input is valid, such as [color=#800000]validateSKU()[/color] for SKU format (i.e. ABC-123) and [color=#800000]validateCostRetailQuantity()[/color] for currency format.[/*]
+    [*][color=#800000]validateProductImage()[/color] checks that a file was selected and the size less than 3MB.[/*]
+[/list]
+[br]
+
+[p]The following shows the error messages that appear for each input that was invalid.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project1_validation.gif[/img]
+[br]
+
+[p]If validation is successful, the SKU should be checked to see if it already exists in the database before submitting the information. If there aren't any duplicates, then [color=#800000]checkForDuplicatesHandler()[/color] uses the ajax utility  method to pass both the form data and the image file data to the [color=#00796B]modify_products.cgi[/color] script.[/p]
+[list]
+    [*][color=#800000]checkForDuplicates()[/color] - uses the [color=#800000]$.get()[/color] utility function and appends the sku to the url before calling the [color=#00796B]check_for_duplicates.cgi[/color] script.[/*]
+[/list]
+[br]
+
+[p][color=#00796B]check_for_duplicates.cgi[/color][/p]
+[p]Executes the query statement and then accesses the [color=#e58a18]row[/color] property of the statement handle to check if the number of rows or matches returned was 0. If it was, then the string "ok" is sent back. Otherwise, "duplicate" is sent back.[/p]
+[br]
+
+<pre><code class="language-perl">
+$query = "SELECT sku FROM product WHERE sku='$sku';";
+my $sth = $dbh->prepare($query);
+$sth->execute();
+</code></pre>
+[br]
+
+[p]The following shows the error message informing the user of a duplicate found in the database after the submit button was clicked and a response was received.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project1_duplicate.gif[/img]
+[br]
+
+[p][color=#00796B]modify_products.cgi[/color][/p]
+[p]Depending on which form called it, this script either inserts, updates, or deletes an entry in the product table in the database. Since the form sent was the one to add a new inventory record, a new record will be inserted into the product table. [color=#664C90]Placeholders[/color] were used in the query statement so that the database can handle escaping single quotes that the user may have entered.[/p]
+[br]
+
+<pre><code class="language-perl">
+$query = "INSERT INTO product (sku, manufacturerID, catID, venID, description, features, cost, retail, quantity, image)
+                            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+$sth = $dbh->prepare($query);
+$affected_rows = $sth->execute($sku, $manufacturer_id, $category, $vendor, $description,
+            $features, $cost, $retail, $quantity, $image_file_name) or die $sth->errstr;
+</code></pre>
+            [br]
+            [p]Uploading the image is done in the subroutine [color=#800000]uploadImage()[/color]. I decided to replace the name of the file with the SKU itself concatenated to the timestamp for when the image was uploaded. This made it easier to refer to the image when populating the form under the tabs and made the image directory cleaner since each image is associated with its SKU. As for the uploaded file itself, it must be written to the proper directory in binary mode.[/p]
+            [br]
+<pre><code class="language-perl">
+my ($name, $path, $extension) = fileparse($image_file_name, '\..*');
+my $timestamp = getTimestamp();
+$image_file_name = $sku . $timestamp . $extension;
+my $file_handle = $q->upload("productImage");
+unless ($file_handle) {
+    die "Invalid handle: $file_handle";
+}
+open UPLOADFILE, ">$upload_dir/$image_file_name" or die "Error, cannot save the file.";
+binmode UPLOADFILE;
+while (<$file_handle>) {
+    print UPLOADFILE $_;
+}
+close UPLOADFILE;
+</code></pre>
+[br]
+
+[p]If validation failed, a duplicate entry was found, or there was an error on the server side, an error message will be displayed to alert the user.[/p]
+[br]
+
+[h4]Edit Inventory Tab[/h4]
+[p]This tab allows the user to edit an existing inventory record from the product table in the database. Both this tab and the Delete Inventory Tab requires the user to first enter the SKU to update or delete so that the product can be populated in the form and shown.[/p]
+[br]
+[p][color=#00796B]get_product.cgi[/color][/p]
+[p]After connecting to the database, following the query statement is executed to get the record matching the SKU. The values from each field are serialized using the separator '|' resulting in a single string to send back.[/p]
+<pre><code class="language-perl">
+$query = "SELECT manufacturerID, category.name, vendor.name, description, features,
+                        cost, retail, quantity, image FROM product
+                        INNER JOIN category ON product.catID=category.id
+                        INNER JOIN vendor ON product.venID=vendor.id WHERE sku='$sku';";
+my $sth = $dbh->prepare($query_statement);
+$sth->execute();
+</code></pre>
+[br]
+
+[p][color=#800000]getProductInfoEditHandler()[/color] in menu.js handles the response from get_product.cgi and sets the value of each input to the corresponding value of each field from the record.[/p]
+[br]
+
+[p][color=#800000]editProduct()[/color] calls [color=#00796B]modify_products.cgi[/color] using [color=#800000]$.ajax()[/color]. if the validation succeeded. It should be noted that uploading an image file is optional in this case because the user may not want the image to change. Thus, validation will succeed whether or not an image file was uploaded. After a response is heard, a confirmation for the status of the request will be toggled.[/p]
+[br]
+
+[p]The following shows the form under the edit tab being populated after a response is heard back from the server. The SKU is first entered and then the focus tabbed off, which will trigger the AJAX call to retrieve the product information.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project1_get_products.gif[/img]
+[br]
+
+[p][color=#00796B]modify_products.cgi[/color][/p]
+[p]The query statement that is executed when the form of this edit tab is submitted via AJAX is one that updates the record. For the edit tab, the image may or may not have been sent along with the request. Thus, [b]undefined[/b] is sent as the value for the image file parameter if the user didn't choose to change the photo. This allows for only the record being updated rather than both the record being updated and the image being uploaded.[/p]
+[br]
+<pre><code class="language-perl">
+# If file name is "undefined", update the record
+$query = "UPDATE product INNER JOIN category ON product.catID=category.id
+                    INNER JOIN vendor ON product.venID=vendor.id
+                    SET manufacturerID=?, category.id=?, vendor.id=?, description=?, features=?,
+                    cost=?, retail=?, quantity=? WHERE sku=?;";
+$sth = $dbh->prepare($query);
+$affected_rows = $sth->execute($manufacturer_id, $category, $vendor, $description, $features,
+                    $cost, $retail, $quantity, $sku) or die $sth->errstr;
+
+# If file name exists, upload the image and update the record
+$query = "UPDATE product INNER JOIN category ON product.catID=category.id
+                    INNER JOIN vendor ON product.venID=vendor.id
+                    SET manufacturerID=?, category.id=?, vendor.id=?, description=?, features=?,
+                    cost=?, retail=?, quantity=?, image=? WHERE sku=?;";
+$sth = $dbh->prepare($query);
+$affected_rows = $sth->execute($manufacturer_id, $category, $vendor, $description, $features,
+                    $cost, $retail, $quantity, $image_file_name, $sku) or die $sth->errstr;
+</code></pre>
+[br]
+
+[h4]Delete Inventory Tab[/h4]
+[p]This tab allows the user to delete an existing record from the product table in the database. It has similar functionality as the edit tab in that the elements representing the input fields are populated on a successful response to an AJAX call to the server (the call to [color=#00796B]get_products.cgi[/color] is the same and will not be explained again). The difference is that the elements are &lt;p&gt; tags and the information of the product cannot be changed. After a response is heard, a confirmation for the status of the request will be toggled.[/p]
+[br]
+
+[p][color=#00796B]modify_products.cgi[/color][/p]
+[p]The query statement executed when the user clicks on the delete button is the following. The image file associated with the SKU is also [color=#800000]unlinked[/color].[/p]
+[br]
+
+<pre><code class="language-perl">
+$query = "SELECT image FROM product WHERE sku='$sku';";
+$sth = $dbh->prepare($query);
+$sth->execute();
+my $old_image_file;
+while (my @row = $sth->fetchrow_array) {
+    $old_image_file = $row[0];
+}
+my $file_to_delete = $upload_dir . "/" . $old_image_file;
+unlink($file_to_delete);
+
+$query = "DELETE FROM product WHERE sku='$sku';";
+$sth = $dbh->prepare($query);
+$affected_rows = $sth->execute();
+</code></pre>
+[br]
+
+[h3]State Management[/h3]
+[p]When the user signed in, a session id was given to the client and must be passed back and forth between the client and the server to authenticate the user on every submission of form data. This prevents unauthorized users from making changes to the database. In order to achieve this, the cookie was written to in signin.cgi with the key as [b]"jadrnxxxSID"[/b] and the value as the session id. The cookie was then printed to the header to be sent back to the client. Every time an event on the client side calls a script, the cookie will be sent.[/p]
+[br]
+
+[p]When creating a new session, an existing session id can be passed in. If the existing session id is valid, it will be the value of the id of the new session object. If not, a new session id is created. Therefore, the session id from the value of the cookie can be checked against the id property of the new session object to see if they match. If they don't, the user is denied access and is redirected to [color=#00796B]error.html[/color].[/p]
+[br]
+
+[p]The following shows how a new session and session id is created and set as the value of the cookie. Occurs in [color=#00796B]signin.cgi[/color].[/p]
+<pre><code class="language-perl">
+my $session = new CGI::Session(undef, undef, {Directory=>'/tmp'});
+$session->expires('+1d');
+my $cookie = $q->cookie(jadrn025SID=> $session->id);
+print $q->header(-cookie=>$cookie);
+</code></pre>
+[br]
+
+[p]The following checks for a match between the cookie's session id value and the id property of the new session object. Occurs at the beginning of every script that connects to the database.[/p]
+[br]
+<pre><code class="language-perl">
+my $q = new CGI;
+    my $cookie_sid = $q-&gt;cookie('jadrn025SID');
+    my $session = new CGI::Session(undef, $cookie_sid, {Directory=&gt;'/tmp'});
+    my $sid = $session->id;
+
+if ($cookie_sid ne $sid) {
+    # print error.html and exit script
+}
+</code></pre>
+[br]
+
+[h3]History and Location[/h3]
+[p]Even after the user logs out and the session gets deleted and the cookie's value emptied, the inventory tabs page could still be navigated to using the back button and accessing the history. To prevent this from happening, the logout's click event handler calls the [color=#e58a18]location[/color] object's [color=#800000]replace()[/color] method. This causes the current page to be replaced with the output from the script. Another advantage is that the current page will not be saved in the session history so the user can't navigate back using the back button.[/p]
+[br]
+
+<pre><code class="language-javascript">
+$('#logout_div a').on('click', function(event) {
+    event.preventDefault();
+    location.replace("/perl/jadrn025/logout.cgi");
+});
+</code></pre>
+[br]
+
+[p]Additionally, an event listener for the [color=#e58a18]onpageshow[/color] event is attached to the window in the case that the page was cached. This will force the page to refresh by calling [color=#800000]location.reload(true)[/color].[/p]
+[br]
+<pre><code class="language-javascript">
+window.addEventListener("pageshow", function(event) {
+    var pageCached = event.persisted || (typeof window.performance != "undefined" &&
+        window.performance.navigation.type === 2);
+    if (pageCached) {
+        window.location.reload(true);
+    }
+});
+</code></pre>
+[br]
+
+[h3]Logging Out[/h3]
+[p]Within the script [color=#00796B]logout.cgi[/color], the session needs to be deleted and the cookie's value needs to be cleared. The changed cookie is then printed to the header. The HTML content that is printed in this script actually redirects the user to [color=#00796B]logout.html[/color].[/p]
+[br]
+<pre><code class="language-perl">
+my $q = new CGI;
+    my $session_id = $q->cookie("jadrn025SID") || undef;
+    my $session = new CGI::Session(undef, $session_id, {Directory=> '/tmp'});
+    $session->delete();
+
+my $cookie = $q->cookie(jadrn025SID=> '');
+    print $q->header(-cookie=>$cookie);
+</code></pre>
+[br]
+
+[img]/projectdetailimages/cs645_project1_logout.gif[/img]
+[br]
+
+[h3]Improvements to consider[/h3]
+[p]The code that I wrote to complete this project actually did not handle the case in which the user shift-refreshes after signing into the inventory page. The issue is that the form data is resent to login again.[/p]
+[list]
+    [*]To avoid this from happening, we must make a round-trip to the client and then redirect to the script which will output the HTML for the inventory page.[/*]
+    [*]An example of this would be starting from login.html, calling the login.cgi script which prints main.html. The main.html page's primary purpose would be to redirect to inventory.cgi which checks the session before outputting its contents.[/*]
+[/list]
+[br]
+
+[p]So if the user tried to press the back button from the inventory page, the browser will ask for the cgi script that printed the protected content, but that script has validation methods, so the user can't get back to the content on shift-refresh.[/p]
+[br]
+
+[p]For logging, out even though I used window.location.replace(<i>url</i>); to get rid of the reference to the inventory page in the history object, an alternative solution would be to replace the content entirely on the event onbeforeunload.[/p]
+[p]For example, could do[/p]
+[br]
+
+<pre><code class="language-javascript">
+$('body').html("logout.html");
+</code></pre>

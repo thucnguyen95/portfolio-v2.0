@@ -1,0 +1,174 @@
+[h2]Assignment Details[/h2]
+[p]The second part of a two-part assignment which will use AJAX, PHP, and MySQL to build the application. Aside from AJAX which requires code on both the client and server side, most of this part of the assignment focuses on server-side code, validation, and connection and insertions to a database. The following are required features that the website must include:[/p]
+[br]
+[list]
+[*][b]AJAX[/b] to verify that the form and thus the user is unique and isn't a duplicate.[/*]
+[*]A [b]PHP script[/b] that reads parameters coming from the form and stores it in a MySQL database.[/*]
+[*]The [b]runner's image[/b] must be uploaded and stored on the server, not the database. Instead, store the name of the image on the database.[/*]
+[*]A [b]report[/b] that acts as a roster of the participants. The roster must be grouped by age category, and alphabetized by last name. The report must include the following:[/*]
+[*]
+[p]- Runner's last name and first name[/p]
+[p]- Runner's image[/p]
+[p]- Runner's age relative to the time the report was accessed[/p]
+[p]- Runner's experience level[/p]
+[p]- Report must be password-protected and accessible after signing in[/p]
+[/*]
+[*]A [b]confirmation page[/b][/*]
+[/list]
+[br]
+[p]The finished product along with the first part of this assignment will have the following:[/p]
+[list]
+[*]Landing page (index.html)[/*]
+[*]Enrollment Form (HTML)[/*]
+[*]Confirmation page (PHP)[/*]
+[*]Error page or message (PHP)[/*]
+[*]Signin Screen for the Roster Report[/*]
+[*]Roster Report[/*]
+[/list]
+[br]
+[p]The Roster Report must be password-protected and can only be accessed through a signin screen with a single text field for the password. There must be at least 3 distinct passwords, one of which must be 'cs545'. The passwords must be encrypted and stored in a text file on the server. An error message should be displayed if the password entered was incorrect. The report should load if the password is correct.[/p]
+[br]
+
+[h2]Additional Notes[/h2]
+[h4]Duplication check using AJAX and PHP, PHP Validation and Submission[/h4]
+
+[list]
+[*]An alternative to printing a confirmation page is to send back an AJAX string and display to the user that he/she is now registered.[/*]
+[*]To find duplicates using AJAX and PHP, use both the email address and the phone number for comparison. Duplicates must be checked for in both the HTML with JS enabled (by using AJAX) and the HTML returned by PHP. In order to see if the duplication check is working, you can submit the user information, click back to return to the validation page, and then click submit again.[/*]
+[*]Use a busywait icon to tell the user that the form is being processed when waiting for the AJAX response to check for duplicates and when uploading the runner's image.[/*]
+[*]Don't explicitly call the handler that is called when there is an AJAX response.[/*]
+[*]Whatever the user inputted, repopulate the form with that information after the submit button is clicked.[/*]
+[*] The report should print out information stored on the database.[/*]
+[/list]
+[br]
+
+[h4]Database, Formatting tables, and Querying[/h4]
+[list]
+    [*]Index and primary keys are unnecessary for this project, only add this when you have a lot of users. For example, your SDSU RedID is a primary key.[/*]
+    [*]Put enough data into the table that are different values. Should have enough teens, adults, and seniors.[/*]
+    [*]Inserting into the database, creating a report, and checking for duplicates would be implemented in different PHP files.[/*]
+    [*]Close the connection opened to the database or else it will be orphaned.[/*]
+    [*]In reality, you would use a thread pool and have connectors open all the time and spawn more threads if needed or if more than the one thread is being recycled.[/*]
+[/list]
+[br]
+
+[h4]Logging into jadran to user the database on opatija server[/h4]
+[p]
+    Log into jadran [br]
+    The following command looks up the user and gives you the password[br]
+    [b]<i>GetMySQLPassword</i>[/b][/p]
+[br]
+[p]Connect to the database on opatija using the following commands. It gives you a command line in MySQL client on opatija. Then you can create tables and make changes to the database. Database name is your account number.[/p]
+<pre><code>
+// On jadrn server
+mysql -u jadrnxxx -h opatija -p
+
+// On opatija
+USE jadrnxxx;
+SHOW tables;
+DESCRIBE table_name;
+</code></pre>
+[br]
+
+[h4]Making a table with MySQL (Better to redirect this into MySQL)[/h4]
+<pre><code>
+USE jadrnxxx;
+DROP TABLE IF EXISTS person;
+CREATE TABLE person(
+    id int AUTO_INCREMENT PRIMARY KEY,  -- don't need this
+    name varchar(50) NOT NULL,          -- can't be blank
+    address varchar(100) NOT NULL,
+    city varchar(30) NOT NULL,
+    state char(2) NOT NULL,
+    zip char(5) NOT NULL,
+    email varchar(50) NOT NULL
+);
+INSERT INTO person VALUES(0, 'Jim Robeson', '3456 Market St', 'San Diego', 'CA', '92104');
+...
+</code></pre>
+[br]
+
+[h4]Echo a text file containing the SQL commands into a database[/h4]
+[list]
+    [*]Allows you to start a clean table for testing or debugging.[/*]
+[/list]
+<pre><code>
+// Redirects from text file to MySQL
+mysql -u jadrnxxx -h opatija -p < make_person_table.txt
+</code></pre>
+[br]
+
+[h4]Running PHP on terminal[/h4]
+<pre><code>
+php file.php
+</code></pre>
+[br]
+
+[h2]Project Details[/h2]
+[p]The third project is a continuation of the second project, so the home page and the forms were the same.[/p]
+[br]
+
+[h3]Processing the Request on the Server[/h3]
+[p][color=#00796B][b]database_functions.php[/b][/color][/p]
+[p]Since there were multiple PHP files that needed to connect to the database separately for different purposes, a file containing the helper functions was made so that it can be reused across many PHP files. This file could then be imported whenever the functions were needed by using include.[/p]
+[p]This file defined the following functions -[/p]
+[list]
+    [*][color=#800000]start_db_connection()[/color] - initiates a connection to the database with parameters specifying the server, the user, the password, and the database. [color=#800000]mysqli_set_charset()[/color] was called, passing in the database and "utf8" for security purposes.[/*]
+    [*][color=#800000]end_db_connection()[/color] - calls [color=#800000]mysqli_close(<i>database</i>)[/color] to end the connection to the database.[/*]
+    [*][color=#800000]escape_string()[/color] - calls [color=#800000]mysqli_real_escape_string(<i>database</i>, <i>data</i>)[/color] to sanitize user input for security purposes.[/*]
+    [*][color=#800000]insert_data_into_db()[/color] - first sanitizes the user input from the POST parameters. Another duplication check was done in this method just in case the user decided to disable javascript and submit his or her information. The query statement was built using the sanitized POST parameters and the query was made on the database.[/*]
+[/list]
+[br]
+
+[p][color=#00796B][b]proj3_process_request.php[/b][/color][/p]
+[p]The file that acts like a main() function. It includes many PHP files and acts like the parent script. Note that the script was immediately exited if the request was not POST, if the validation failed, or if there were issues with the runner's image. However, if all of these checks were to pass successfully, the confirmation page would be returned.[/p]
+[br]
+<ol>
+    [*]First, it checks if the CGI was specifically POST and if not, it would call [color=#800000]write_error()[/color] which is a function that uses a heredoc to return a simple HTML page notifying the user of the error.[/*]
+    [*]The file then imports the [color=#00796B]validation.php[/color] file, and checks the return value from [color=#800000]validate_data()[/color] to see if the POST parameters validated. The [color=#00796B]validation.php[/color] file is similar to the Javascript file on the registration form, in that it checks to see if user input was empty for certain fields, if a valid phone number of zip code was sent, and so on. If the validation failed, then the [color=#00796B]error_form.php[/color] file was used as the HTML output to return to the client. The [color=#00796B]error_form_functions.php[/color] file contained functions to repopulate the form with the user data that was originally sent to the server.[/*]
+    [br]
+    
+    [img]/projectdetailimages/cs545_project3_phpvalidationpreview.gif[/img]
+    [br]
+
+    [*][color=#00796B]upload_image.php[/color] was the file specifically created to handle possible issues with the runner's image sent. First, it checks if the file already exists by checking the image directory that contained the entire images of runners. Since each image name had the runner's phone number appended to it, a duplicate check could be done. The file then checks for any errors in uploading, including file size exceeding the maximum size permitted. Lastly, the image extension was checked to see if it matched either [b].JPEG[/b], [b].PNG[/b], or [b].BMP[/b]. If any of these checked failed, the script was exited and an error message was returned. If it succeeded, the image was uploaded to the directory.[/*]
+    [br]
+    [p]Preview of what is returned if uploading the image fails[/p]
+    [br]
+    
+    [img]/projectdetailimages/cs545_project3_duplicatepreview.png[/img]
+    [br]
+
+    [*]The script then calls [color=#800000]insert_data_into_db()[/color] to insert the user's data into the database, and the [color=#00796B]confirmation.php[/color] file was returned to the client with populated fields.[/*]
+</ol>
+[br]
+[p]What was interesting about this entire process was that data could be directly embedded in the HTML by using the [color=#800000]&lt;php ?&gt;[/color] tag. This allowed for displaying different kinds of data depending on the conditions you specify.[/p]
+[br]
+
+[h3]Checking for Duplicates using AJAX[/h3]
+[p]There were minor changes to the Javascript file for the registration page. Under [color=#00796B]registration_jquery.js[/color], the default event of the submit input was prevented from running by calling [color=#800000]event.preventDefault()[/color] on success of validating the user's inputs. Instead, the url string to call the php file ([color=#00796B]check_duplicate.php[/color]) was manually created by attaching the email and phone parameters to the url, and subsequently defining the url as a parameter for the [color=#800000]$.get()[/color] utility method. This allows some event to occur only [b]after[/b] a response from the server was heard.[/p]
+[br]
+[p]The handler that was invoked after a response was received was the [color=#800000]duplicateHandler()[/color] function. It checks whether the response equates to expected strings "dup", "suc", or anything else. If a duplicate was found, an error was shown on the registration page. If there weren't any duplicates found, the form was allowed to serialize and submit.[/p]
+[br]
+[p][color=#00796B][b]check_duplicate.php[/b][/color][/p]
+[p]Connects to the database using the helper method defined in [color=#00796B]database_functions.php[/color]. Grabs the GET parameters sent to the file, which was the email and the phone number, and queries the database to find any matches for [b]both[/b] the phone number and the email. The connection to the database was ended, and depending on how many affected rows there were from the query, the appropriate strings were sent back to the JS file.[/p]
+[br]
+
+[h3]Logging in and the Roster Report[/h3]
+[p][color=#00796B]report.php[/color] is the main file that runs when trying to navigate to the roster, but the [color=#00796B]login.php[/color] file is what is returned if either a password had not been provided yet or the password was invalid.[/p]
+[br]
+
+[p][color=#00796B][b]login.php[/b][/color][/p]
+[p]Contains a single input text field for the user to enter a password. If the password entered is invalid, then the HTML spcified in login.php is returned again but with a red border around the input field to indicate an error.[/p]
+[br]
+[img]/projectdetailimages/cs545_project3_loginpreview.png[/img]
+[br]
+
+[p][color=#00796B][b]report.php[/b][/color][/p]
+[p]Checks to see if there were any POST parameters sent. No POST parameters are expected to be sent if the user just visited the page. If there was a POST parameter sent which is expected to be the password since it was the only value sent, then it is checked to see if it matches any of the values stored in the [color=#00796B]passwords.txt[/color] file.[/p]
+[br]
+[p]The [color=#00796B]passwords.txt[/color] file contains a list of valid, encrypted passwords. In order to check for any matches, a simple loop is done on this passwords list and the [color=#800000]crypt()[/color] function is used to check for matches. The function takes a password and hashes it the same way as it hashed the passwords in the password list depending on the given salt. It is able to follow the same algorithm it used, so the hashed passwords and the user input can be compared. If any matches are found, the report is generated.[/p]
+[br]
+[p]The report is genereated by creating a table along with rows for each runner who had successfully registered and added to the database. The loop uses the [color=#800000]mysqli_fetch_assoc()[/color] function to return an associative array. This is so that the keys, which are the names of the columns in the table of in the database, can be used as conditions to execute different blocks of code. The keys used were the ones for the runner's image and the date of birth. This was done because the table data for these keys were different: one requires an image tag and the other a modified string describing the age of the runner (which must be calculated).[/p]
+[br]
+[img]/projectdetailimages/cs545_project3_reportpreview.gif[/img]

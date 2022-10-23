@@ -1,0 +1,1276 @@
+
+[h2]Assignment Details[/h2]
+[p][b]The main entry point must be a file named proj2.html, not index.html.[/b][/p]
+[br]
+
+[p]We will be using the Tomcat web server instead of Apache for most of this project. All files for this project must go in or below your web_services subdirectory. This means all files including html, css, js, etc. The sole exception to this is product image files. Since you have stored product images in your public_html area, you should leave them there, and use a URL that points to your images folder. Other than images, [b]no part of the project may be in or below public_html[/b].[/p]
+[br]
+
+[p]You will access your online store (the landing page) via the following URL pattern (Note that there is no ~ (tilde) character in the URL): <i>http://jadran.sdsu.edu/jadrnXXX/proj2.html</i>[/p]
+[br]
+
+[h3]Assignment[/h3]
+[p]This is a continuation of the previous project. For this assignment, you will write the customer application, the online storefront. This application is the 'face' of your business to the public. You should make every effort to make this application attractive, friendly, and easy to use. The appearance and ease of use will be weighted heavily during grading.[/p]
+[br]
+
+[p]All dynamic content coming from the server must be done with Java servlets or JSP. You may not use Perl, PHP or anything else for dynamic code on the server side other than Java. You should also plan to make optimum use of Javascript to enhance your site. The only external framework or libraries you may use are Bootstrap and jQuery.[/p]
+[br]
+
+[h3]Details[/h3]
+[list]
+    [*]There should [b]NOT[/b] be any kind of login screen.[/*]
+    [*]Your application will allow users to browse through your store offerings easily.[/*]
+    [*]You should include search functionality or filters to assist customers in finding what they want.[/*]
+    [*]When any item is visible on screen, you should show the manufacturer's id, thumbnail image, price of each item, and status, "in stock" or "coming soon".[/*]
+    [*]When an item is selected, you should show complete information about the item including a larger image, description, features, and the retail price. <i>(do not display fields that are inappropriate, such as the cost or any internal stocknumbers)</i>[/*]
+    [*]The actual functionality and menu structure of the application is up to you. You have considerable flexibility about how you design this application.[/*]
+    [*]All of the items in your product database table should be displayed regardless of the on hand quantity.[/*]
+    [*]
+        [p]- [b]in stock[/b], the on_hand quantity > 0.[/p]
+        [p]- [b]coming soon[/b], the on_hand quantity = 0.[/p]
+    [/*]
+    [*]Be sure to insert a minimum of 25 records in the inventory database table, of which at least 20 must be in stock, with an on hand quantity > 0. Include at least 5 items that are in the inventory table but not in stock.[/*]
+    [*]You will offer a 'shopping cart' which will offer 'Add to shopping cart' and 'Check Out Now' buttons. A link or button to the shopping cart should always be visible.[/*]
+    [*]
+        [p]- Users may select items and add them to the shopping cart. You will want to use AJAX for this to avoid refreshing the current page. You must save the state of your shopping cart so that users can put things in the cart then continue shopping.[/p]
+        [p]- Customers may not purchase items (or put them in the shopping cart) that you don't have. If a customer wants to purchase a quantity that exceeds your on hand quantity, you must alert the customer that the quantity is unavailable.[/p]
+        [p]- Customers should be able to modify quantities or delete items from the shopping cart at will.[/p]
+        [p]- The 'Check Out Now' button should take the users to a screen where they may purchase the items in the shopping cart with a credit card. NOTE: There must NOT be a login screen for this application. Required fields for this are:[br]
+        [b]Shipping Information[/b] (Name, Address, Address, City, State, Zip, Contact Phone)[br]
+        [b]Billing Information[/b] (Name, Address, Address, City, State, Zip, Phone, Credit Card Type, Credit Card Number, Credit Card Expiration Date, Security Code)[/p]
+        [p]- The two addresses may be different. The billing information must match what the credit card company has on file for that customer. Add a checkbox to allow the user to use the billing address for the shipping address. <i>[The user shouldn't have to enter the same address twice.]</i>[/p]
+        [p]- When using/testing your application, please do [b]NOT[/b] enter valid credit card information![/p]
+        [p]- Once shipping and billing information has been entered, display an Order Summary page which shows the name and address to which the items will be shipped, the items ordered, and the quantity for each with extension. Include a $5.00 shipping charge and 7.75% sales tax. In California, sales tax is applied to the shipping charge when it is a flat amount, so include the $5.00 shipping charge when calculating the tax. Show a total for the order and give the buyer the options to 'Place Order' or 'Cancel'. Display a confirmation page after a successful purchase to let the customer know the order was accepted and the merchandise is on the way. <i>(The cancel option does not remove items from the shopping cart, but just returns the user to the main page. The 'Place Order' choice should remove the purchased items from the shopping cart.)</i>[/p]
+    [/*]
+    [*]A customer purchase should cause the quantity in the product table in your database to be modified. This will reduce the quantity by the number purchased.[/*]
+    [*]Once the purchase has been completed, there need not be any facility for the customer to return to or view/modify/cancel the order.[/*]
+    [*]Also, note that you are not storing the customer information (name, addresses, credit card # etc). Of course, a real business would store this information in the database, but this has been deleted from your project to keep the size of it manageable.[/*]
+[/list]
+[br]
+[p]You may use xhtml, html 5, CSS ,Javascript, AJAX, Bootstrap, jQuery, Java Servlets, JSP, JDBC and also the MySQL database on opatija for this project.[/p]
+[br]
+
+[h2]Project Details[/h2]
+[br]
+[p][color=#00796B]DBHelper.java[/color][/p]
+[p]Throughout this project, there were connections that had to be made to the database on Opatija in order to manage data on the server. This class is a helper class containing static methods whenever something needs to be added, updated, and essentially executed on and to the database. Note that [color=#800000]runQuery()[/color] and [color=#800000]doQuery()[/color] was written by [b]Professor Riggins[/b]. I based [color=#800000]runUpdate()[/color] and [color=#800000]runSearch()[/color] off of his examples.[/p]
+[br]
+[list]
+    [*][color=#800000]runQuery()[/color] - takes the String parameter expected to be a sql statement and executes it, placing all the details (fields) of each record into an array, and building a vector of those arrays. The vector of array of Strings is returned.[/*]
+    [br]
+
+<pre><code class="language-java">
+public static Vector&lt;String[]&gt; runQuery(String query) {
+    String answer = "";
+    Vector&lt;String []&gt; answerVector = null;
+
+    try {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        connection = DriverManager.getConnection(connectionURL);
+        statement = connection.createStatement();
+        resultSet = statement.executeQuery(query);
+
+        ResultSetMetaData rsmd = resultSet.getMetaData();
+        answerVector = new Vector&lt;String []&gt;();
+
+        while(resultSet.next()) {
+            String [] row = new String[rsmd.getColumnCount()];
+            for(int i = 0; i < rsmd.getColumnCount(); i++) {
+                row[i] = resultSet.getString(i + 1);
+            }
+            answerVector.add(row);
+        }
+    }
+    catch(Exception error) {
+        error.printStackTrace();
+    }
+
+    // Closes resources if open.
+    ...
+    return answerVector;
+}
+</code></pre>
+[br]
+
+    [*][color=#800000]doQuery()[/color] - similar to [color=#800000]runQuery()[/color] except that a serialized String of all the records and their fields is returned. For each field being traversed, the type is checked and categorized using a switch statement in order to parse out the potential types into Strings.[/*]
+    [br]
+
+<pre><code class="language-java">
+public static String doQuery() {
+    String answer = "";
+    ...
+    while(resultSet.next()) {
+        int columns = rsmd.getColumnCount();
+
+        for(int i = 1; i <= columns; i++) {
+
+            switch (rsmd.getColumnType(i)) {
+                case Types.CHAR:
+                case Types.VARCHAR:
+                    answer += resultSet.getString(i);
+                    break;
+                case Types.DECIMAL:
+                    answer += String.format("%.2f", resultSet.getBigDecimal(i).doubleValue());
+                    break;
+                case Types.INTEGER:
+                    answer += resultSet.getInt(i);
+                    break;
+                default:
+                    break;
+            }
+            if (i < columns) {
+                answer += "|";
+            }
+        }
+        answer += "||";
+    }
+    ...
+    return answer;
+}
+</code></pre>
+    [br]
+    
+    [*][color=#800000]runUpdate()[/color] - the sql statement expected is one that updates the database, so a prepared statement and [color=#e58a18]executeUpdate()[/color] are used instead of the usual [color=#e58a18]createStatement()[/color] and [color=#e58a18]executeQuery()[/color] for the SELECT statements.[/*]
+    [br]
+
+    <pre><code class="language-java">
+    public static String runUpdate() {
+        String answer = "";
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            connection = DriverManager.getConnection(connectionURL);
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.executeUpdate();
+
+            answer = "ok";
+        }
+        ...
+        return answer;
+    }
+    </code></pre>
+    [br]
+
+    [*][color=#800000]runSearch()[/color] - takes the search term from the argument and implants it between wildcards (*) in order to search for products (from the vendor, category, and description) that match or contain the term. Note that a prepared statement and binding values should have been used for security purposes. This method is explained under "Search Functionality".[/*]
+    [br]
+[/list]
+[br]
+
+[h3]Contact[/h3]
+[p]The JSP file, [color=#00796B]contact.jsp[/color], contains static content describing customer service hours and fictional information including the phone and email that users can use for inquiries.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_contactpreview.png[/img]
+[br]
+
+[h3]Featured Brands[/h3]
+[p][color=#00796B]featured_brands.jsp[/color] is also a Java Servlet Page that contains static content. It lists the brands or vendors of backpacks that this website sells, as well as information describing the vendors.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_featuredbrands.gif[/img]
+[br]
+
+[h3]Packback Home[/h3]
+[p][color=#00796B]proj2.html[/color][/p]
+[h4]<u>Image Slider</u>[/h4]
+[p]The home page uses a slider to catch the user's attention to the products of the fictional company, which I named as Packback. This company sells backpacks from well-known vendors at a discounted price.[/p]
+[br]
+
+[p]This slider was based off of the slider from the <a href="https://www.w3schools.com/w3css/w3css_slideshow.asp">tutorial</a> on w3school's website. Click Event Handlers were added to the previous and next slider buttons on the sides of the slider as well as the image selector buttons below the slider. If the user clicks on these buttons, the slider would increment, decrement, or update the current index to the array of slider images.[/p]
+[br]
+
+[p][color=#00796B]proj2.js[/color][/p]
+[br]
+<pre><code class="language-javascript">
+$(document).ready(function() {
+    ...
+
+    // HEADER IMAGE SLIDER //
+    $('.slider_previous').on('click', function(){
+        clearTimeout(timeoutFunction);
+        incDecCurrentSlide(-1);
+    });
+    $('.slider_next').on('click', function(){
+        clearTimeout(timeoutFunction);
+        incDecCurrentSlide(1);
+    });
+    $('.slider_click').on('click', function(){
+        clearTimeout(timeoutFunction);
+        setCurrentSlide($(this).index() + 1);
+    });
+    displaySlides();
+});
+
+function incDecCurrentSlide(amount) {
+    currentSliderIndex += amount;
+    displaySlides();
+}
+
+function setCurrentSlide(amount) {
+    currentSliderIndex = amount;
+    displaySlides();
+}
+</code></pre>
+[br]
+
+[p]The bulk of the functionality was in [color=#800000]displaySlides()[/color]. Every time this function was called, the current index was checked and set to not go out of bounds. All images that weren't the current index would have its display property set to none. The dots/circles below the slider also had their background-color updated. After 5 seconds, this function would increment the current index and call itself.[/p]
+[br]
+
+<pre><code class="language-javascript">
+function displaySlides() {
+    var slides = $('.single_slide');
+
+    // Check that current index of the slider doesn't go out of bounds
+    if (currentSliderIndex > slides.length) {
+        currentSliderIndex = 1;
+    }
+    if (currentSliderIndex < 1) {
+        currentSliderIndex = slides.length;
+    }
+
+    // Reset each slider image display property to none and remove class active
+    // for each click button. Set display to block for the current slide and
+    // active for the current click button associated with the current slide.
+    slides.each(function(index) {
+        if (index == currentSliderIndex - 1) {
+            $(this).css("display", "block");
+        }
+        else {
+            $(this).css("display", "none");
+        }
+    });
+
+    $('.slider_click').each(function(index) {
+        if (index == currentSliderIndex - 1) {
+            $(this).addClass('active');
+        }
+        else {
+            $(this).removeClass('active');
+        }
+    });
+
+    // Set the appropriate heading and text description for the current slide.
+    $('.text')[currentSliderIndex - 1].innerHTML = "&lt;h2&gt;" + sliderHeadingList[currentSliderIndex - 1] +
+        "&lt;/h2&gt;&lt;p&gt;" + sliderTextList[currentSliderIndex - 1] + "&lt;/p&gt;";
+
+    // Increment the slider index and call this function again after 5 seconds.
+    timeoutFunction = setTimeout(function(){
+        currentSliderIndex++;
+        displaySlides();
+    }, 5000);
+}
+</code></pre>
+[br]
+
+[p]A preview of what the slider looks like:[/p]
+[img]/projectdetailimages/cs645_project2_homeslider.gif[/img]
+[br]
+
+[h4]<u>Trending Products</u>[/h4]
+[p]An AJAX call is performed, which expects a response from the servlet [color=#00796B]TrendingProducts.java[/color] on the server. The response is a serialized String containing four randomized products along with the product details that are available for sale. After receiving a successful response, the images are set in their respective containers as well as the large image preview. For each click of a trending image, the details are populated in the details pane, including the product vendor, manufacturer id, and description.[/p]
+[br]
+
+<pre><code class="language-javascript">
+$(document).ready(function() {
+    ...
+
+    // TRENDING PRODUCTS //
+    $.get("/jadrn025/servlet/TrendingProducts", trendingProductsHandler);
+
+    $("#trending_preview img, #trending_details > p:first-child").on("click", navigateToProductDetails);
+});
+
+function changePreviewImage() {
+
+    // Initially set preview image as first product in listOfTrendingProducts
+    var firstProduct = listOfTrendingProducts[0].split("|");
+    $("#trending_preview img").prop({
+        "src": "/~jadrn025/proj1/product_images/" + firstProduct[4],
+        "id": firstProduct[0]
+    });
+    $("#trending_details > p:first-child").text(firstProduct[2] + " " + firstProduct[1]);
+    $("#trending_details > p:nth-child(2)").text(firstProduct[3]);
+
+    // For every click of an image in the column, show the preview of that image,
+    // and change the details in the detail pane.
+    $("#trending_column > div").on("click", function(event) {
+        var index = $(this).index();
+        var product = listOfTrendingProducts[index].split("|");
+        $("#trending_preview img").prop({
+            "src": "/~jadrn025/proj1/product_images/" + product[4],
+            "id": product[0]
+        });
+
+        // The product vendor and manufacturerID
+        $("#trending_details > p:first-child").text(product[2] + " " + product[1]);
+
+        // The product description
+        $("#trending_details > p:nth-child(2)").text(product[3]);
+    });
+}
+</code></pre>
+[br]
+
+[p]Furthermore, because the id attribute was set for each trending image, it can be used as the value for the parameter, sku, whenever the user clicks on the product name, which sends a GET request to [color=#00796B]ProductDetails.java[/color][/p]
+[br]
+
+<pre><code class="language-javascript">
+function navigateToProductDetails() {
+    var id = $("#trending_preview img").prop("id");
+    var urlPath = "/jadrn025/servlet/ProductDetails?sku=" + id;
+    window.location.href = urlPath;
+}
+</code></pre>
+[br]
+
+[p]A preview of what the Trending Products section of the home page looks like:[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_hometrendingproducts1240.gif[/img]
+[br]
+
+[p][color=#00796B]TrendingProducts.java[/color][/p]
+[p]Runs the following query by calling static method runQuery of the [color=#e58a18]DBHelper[/color] class - [/p]
+[br]
+
+<pre><code class="language-java">
+public class TrendingProducts extends HttpServlet {
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws IOException, ServletException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        // Query to return information about specific sku
+        String query = "SELECT sku, manufacturerID, vendor.name, description, image FROM product, vendor 
+                            WHERE product.venID = vendor.id AND (quantity > 0);";
+
+        Vector&lt;String[]&gt; productDetailsVector = DBHelper.runQuery(query);
+
+        ...
+
+        // Shuffle the collection and return the first 4 records
+        Collections.shuffle(productDetailsVector);
+
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; i < 4; i++) {
+            String[] product = productDetailsVector.get(i);
+
+            for (int p = 0; p < product.length; p++) {
+                String field = product[p];
+                buffer.append(field);
+
+                if (p < (product.length - 1)) {
+                    buffer.append("|");
+                }
+            }
+            if (i < 3) {
+                buffer.append("||");
+            }
+        }
+        out.print(buffer.toString());
+    }
+}
+</code></pre>
+[br]
+
+[p]The vector of array of Strings is then shuffled, and the product and its details (sku, vendor, manufacturer id, description, and image file name) are serialized. The "|" character separates the details, and the "||" characters separate the products. Only 4 products are returned in the response.[/p]
+[br]
+
+[h4]<u>Featured Brands</u>[/h4]
+[p]Clicking on the image will navigate the user to the Featured Brands page.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_homefeaturedbrands.gif[/img]
+[br]
+
+[h3]Browse[/h3]
+[p]Lists all the products available for purchase in a grid, with each grid item displaying the product vendor, manufacturer id, trimmed description, status, quantity, and price. The status will show as "In stock" with a green text color or "Coming soon" with a red text color, depending on whether or not the quantity is greater than 0. The sidebar contain checkboxes, each with a set of names which define the kind of filter to use for displaying the items, and the values for those names (expected to be laid out in an array). This means that the products and each grid item will be dynamically generated based on the filters checked.[/p]
+[br]
+
+[p]In the [color=#00796B]browse.js[/color] file, a click event is added to each checkbox, so that whenever one is checked or unchecked, the handler [color=#800000]filterOptionChecked[/color] will be fired.[/p]
+[br]
+[list]
+    [*][color=#800000]filterOptionChecked()[/color] - sends an AJAX request to the servlet [color=#00796B]ProductsFilter.java[/color]. On success, the response is sent as an argument to [color=#800000]updateGrid()[/color].[/*]
+    [br]
+    [*][color=#800000]updateGrid()[/color] - clears the current list of products, and deserializes the response from the AJAX call and builds the grid item for each product. Splits products by characters '||', then splits each product by character '|' in order to grab its details. Note that when creating the HTML string with the product details, the id attribute for the "Add to Cart" button is set as the sku.[/*]
+[/list]
+[br]
+
+[p][color=#00796B]browse.js[/color][/p]
+[br]
+
+<pre><code class="language-javascript">
+function filterOptionChecked() {
+
+    var urlPath = "/jadrn025/servlet/ProductsFilter";
+    var serializedData = $('form[name="productsFilterForm"]').serialize();
+
+    if ($('form[name="productsFilterForm"] :checkbox:checked').length == 0) {
+        var gridContainerHandle = document.getElementById('products_grid');
+        gridContainerHandle.innerHTML = "";
+        refocus();
+        return;
+    }
+
+    $.ajax({
+        url: urlPath,
+        type: "GET",
+        data: serializedData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            updateGrid(response);
+        },
+        error: function(response) {
+            console.log("AJAX call to ProductsFilter returned an error: " + response);
+        }
+    });
+}
+
+function updateGrid(response) {
+
+    currentListOfProducts = [];
+
+    // Split the serialized string from the response per record or product.
+    var listOfSerializedProducts = response.split('||');
+
+    // Set currentListOfProducts to the relevant list of products to display
+    for (var i = 0; i < listOfSerializedProducts.length; i++) {
+        var productInformation = listOfSerializedProducts[i].split('|');
+        currentListOfProducts[i] = productInformation;
+    }
+
+    // Build the string representing the content for the grid
+    var gridString = "";
+    for (var i = 0; i < currentListOfProducts.length; i++) {
+
+        var description = currentListOfProducts[i][4];
+        if (description.length > 60) {
+            description = description.substring(0, 60);
+        }
+        description += "...";
+
+        var status;
+        var statusClass;
+        if (currentListOfProducts[i][6] > 0) {
+            status = "In Stock";
+            statusClass = "in_stock";
+        } else {
+            status = "Coming Soon";
+            statusClass = "coming_soon";
+        }
+
+        // Build the grid by concatenating it to the string
+        gridString += "&lt;div class=\"product_box\"&gt;&lt;div class=\"product_image\"&gt;" +
+        "&lt;img src=\"/~jadrn025/proj1/product_images/" + currentListOfProducts[i][7] + "\" alt=\"" +
+        currentListOfProducts[i][2] + " " + currentListOfProducts[i][1] + "\"&gt;&lt;/div&gt;&lt;p&gt;" +
+        currentListOfProducts[i][2] + " " + currentListOfProducts[i][1] + "&lt;/p&gt;&lt;p&gt;" +
+        description + "&lt;/p&gt;&lt;div class=\"product_status_price\"&gt;&lt;div&gt;&lt;p class=\"" +
+        statusClass  + "\"&gt;" + status + "&lt;/p&gt;&lt;p&gt;" + currentListOfProducts[i][6] +
+        " left&lt;/p&gt;&lt;/div&gt;&lt;p&gt;$" + currentListOfProducts[i][5] +
+        "&lt;/p&gt;&lt;/div&gt;&lt;button type=\"button\" id=\"" + currentListOfProducts[i][0] +
+        "\"&gt;Add to Cart&lt;/button&gt;&lt;/div&gt;";
+    }
+    var gridContainerHandle = document.getElementById('products_grid');
+    gridContainerHandle.innerHTML = gridString;
+
+    refocus();
+}
+</code></pre>
+[br]
+
+[p]In order to navigate the user to the dynamically-generated JSP page which shows the product details and allows the user to add a certain quantity to their cart, a delegated event was attached to the parent grid container.[/p]
+[br]
+[list]
+    [*][color=#800000]addToCartDelegatedEvent()[/color] - first checks that any descendant buttons of the parent grid container has the text "Add to Cart". Then gets the index of the grid item relative to its parent container to be used as the index in the array of products. This will return the correct product in which the "Add to Cart" button was associated with. The sku value is then used for the sku parameter in [color=#00796B]ProductDetails.java[/color].[/*]
+[/list]
+[br]
+
+<pre><code class="language-javascript">
+function addToCartDelegatedEvent() {
+    $('#products_grid').on('click', $('#products_grid input[type="button"]'), function(event) {
+
+        // Check if the event element has the value 'Add to Cart' which verifies
+        // that the button was clicked, which can be referenced by event.target.
+        if ( $(event.target).text() != 'Add to Cart') {
+            return;
+        }
+
+        // Note: the sku can alternatively be grabbed from the id attribute of the button
+        var productIndex = $(event.target).closest('div').index();
+
+        // Call ProductDetails.java and redirect to ProductDetails.jsp
+        var urlPath = "/jadrn025/servlet/ProductDetails?sku=" + currentListOfProducts[productIndex][0];
+        window.location.href = urlPath;
+    });
+}
+</code></pre>
+[br]
+
+[p][color=#00796B]ProductsFilter.java[/color][/p]
+[p]Called to filter the database given the options the user checked off. Builds the query for the database and returns the details of the products that meet the filter criteria. [color=#800000]buildQuery()[/color] constructs the sql statement to be run using 'AND' for each category and 'OR' for multiple checks within a filter category. For example, 'AND' would be used if the user filters based on vendor and category, and 'OR' used if user checked off 'Adidas' and Herschel' for the vendor.[/p]
+[br]
+
+<pre><code class="language-java">
+private String buildQuery(HttpServletRequest request) {
+
+    Enumeration&lt;String&gt; keys = request.getParameterNames();
+
+    StringBuffer buffer = new StringBuffer("SELECT sku, manufacturerID, vendor.name, category.name, description, retail, quantity, image " +
+    "FROM product, vendor, category WHERE product.venID = vendor.id AND product.catID = category.id");
+
+    boolean categoryValueExists = (request.getParameterValues("category") != null &&
+        request.getParameterValues("category").length > 0);
+    boolean vendorValueExists = (request.getParameterValues("vendor") != null &&
+        request.getParameterValues("vendor").length > 0);
+
+    while (keys.hasMoreElements()) {
+        String parameter = keys.nextElement();
+        switch (parameter) {
+            case "category":
+                // Break if no values associated with parameter
+                if (!categoryValueExists) {
+                    break;
+                }
+                buffer.append(" AND (");
+                for (String value : request.getParameterValues("category")) {
+                    buffer.append(" category.name='" + value + "' OR");
+                }
+
+                // Delete the " OR" at the end and close out the parentheses
+                buffer.delete(buffer.length() - 3, buffer.length());
+                buffer.append(")");
+                break;
+
+            case "vendor":
+                // Break if no values associated with parameter
+                if (!vendorValueExists) {
+                    break;
+                }
+                buffer.append(" AND (");
+                for (String value : request.getParameterValues("vendor")) {
+                    buffer.append(" vendor.name='" + value + "' OR");
+                }
+
+                // Delete the " OR" at the end and close out the parentheses
+                buffer.delete(buffer.length() - 3, buffer.length());
+                buffer.append(")");
+                break;
+
+            case "price":
+                // Break if null or no values associated with parameter
+                if (request.getParameterValues("price") == null) {
+                    break;
+                }
+                if ( !(request.getParameterValues("price").length > 0) ) {
+                    break;
+                }
+                buffer.append(" AND (");
+                for (String value : request.getParameterValues("price")) {
+                    if (value.equals("0-25")) {
+                        buffer.append(" retail BETWEEN 0 AND 25 OR");
+                    }
+                    else if (value.equals("25-50")) {
+                        buffer.append(" retail BETWEEN 25 AND 50 OR");
+                    }
+                    else if (value.equals("50-100")) {
+                        buffer.append(" retail BETWEEN 50 AND 100 OR");
+                    }
+                    else if (value.equals("100+")) {
+                        buffer.append(" retail >= 100 OR");
+                    }
+                }
+
+                // Delete the " OR" at the end and close out the parentheses
+                buffer.delete(buffer.length() - 3, buffer.length());
+                buffer.append(")");
+                break;
+
+            case "availability":
+                // Break if null or no values associated with parameter
+                if (request.getParameterValues("availability") == null) {
+                    break;
+                }
+                if (! (request.getParameterValues("availability").length > 0) ) {
+                    break;
+                }
+
+                buffer.append(" AND (");
+                for (String value : request.getParameterValues("availability")) {
+                    if (value.equals("instock")) {
+                        buffer.append(" quantity > 0 OR");
+                    }
+                    else if (value.equals("comingsoon")) {
+                        buffer.append(" quantity = 0 OR");
+                    }
+                }
+                // Delete the " OR" at the end and close out the parentheses
+                buffer.delete(buffer.length() - 3, buffer.length());
+                buffer.append(")");
+
+                break;
+            default:
+                break;
+        }
+    }
+    buffer.append(";");
+    return buffer.toString();
+}
+</code></pre>
+[br]
+
+[p]The following shows an example of what happens when the user clicks on an option for filtering the products.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_browse1240.gif[/img]
+[br]
+
+[p]The products can be filtered more specifically, by clicking multiple options in a filter category.[/p]
+[img]/projectdetailimages/cs645_project2_browsefilter.gif[/img]
+[br]
+
+[p][color=#00796B]ProductDetails.java[/color][/p]
+[p]Servlet that queries database for information about the specific sku and forwards result to [color=#00796B]ProductDetails.jsp[/color] to display the information.[/p]
+[br]
+
+<pre><code class="language-java">
+public void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws IOException, ServletException {
+
+    ...
+
+    // Query to return information about specific sku
+    String query = "SELECT sku, manufacturerID, vendor.name, category.name, description, features, retail, quantity, image " +
+    "FROM product, vendor, category WHERE product.venID = vendor.id AND product.catID = category.id " +
+    "AND sku='" + request.getParameter("sku") + "';";
+
+    Vector&lt;String[]&gt; productDetailsVector = DBHelper.runQuery(query);
+    if (productDetailsVector == null) {
+        ...
+        return;
+    }
+
+    // Expect to get only 1 record because each sku is unique
+    String[] productDetails = productDetailsVector.get(0);
+
+    request.setAttribute("product", productDetails);
+    RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/ProductDetails.jsp");
+    dispatcher.forward(request, response);
+}
+</code></pre>
+[br]
+
+[p][color=#00796B]product_details.js[/color][/p]
+[p]Handles adding an amount of the product to the user's shopping cart appropriately by writing the sku and quantity to the cookie. If at any time the difference between the amount desired the the amount available results in a quantity of 0 or under, the transaction is considered invalid. The two checks to do before adding to the cart include a rough/soft check, and an actual/reliable check:[/p]
+[br]
+[list]
+    [*][color=#800000]validateAvailability()[/color] - the soft check, which takes the number from the quantity text (which was originally set after forwarding the product information from [color=#00796B]ProductDetails.java[/color] to [color=#00796B]ProductDetails.jsp[/color]) and compares it to the amount the user entered in the input text.[/*]
+    [br]
+    [*][color=#800000]validateQuantityFromDB()[/color] - the actual and more reliable check. The comparison of the quantity desired and the quantity available is done in [color=#00796B]ValidateQuantity.java[/color]. This check is more reliable because it acutally queries the database to get the most recent quantity of the product. The user could have been inactive before adding quantities to the shopping cart.[/*]
+[/list]
+[br]
+
+<pre><code class="language-javascript">
+function validateAvailability() {
+
+    var cartSize = cart.size();
+    $('#cart_quantity').text(cartSize);
+
+    var quantity = parseInt($('#quantity').text());
+    var quantityToPurchase = parseInt($('#details_container input[type="text"]').val());
+    var pattern = new RegExp(/^[1-9]\d*$/);
+
+    if ( !trim(quantityToPurchase) || (!pattern.test(quantityToPurchase)) ) {
+        // show error
+        return;
+    }
+
+    if (quantity - quantityToPurchase < 0) {
+        // show error
+        return;
+    }
+
+    validateQuantityFromDB();
+}
+
+function validateQuantityFromDB() {
+
+    var sku = $('#details_container button').prop("id");
+    var quantityToPurchase = parseInt($('#details_container input[type="text"]').val());
+    var url = "/jadrn025/servlet/ValidateQuantity?sku=" + sku + "&quantity=" + quantityToPurchase;
+    $.get(url, validateQuantityFromDBHandler);
+}
+
+function validateQuantityFromDBHandler(response) {
+
+    if (response == "valid") {
+
+        // The button's id is the sku, so grab that
+        var sku = $('#details_container button').prop("id");
+        var quantityToPurchase = parseInt($('#details_container input[type="text"]').val());
+        cart.setQuantity(sku, quantityToPurchase);
+        var cartSize = cart.size();
+        $('#cart_quantity').text(cartSize);
+
+        // show confirmation success for adding to cart
+    }
+    else if (response == "invalid") {
+        // show error
+    }
+    else {
+        // show error
+    }
+}
+</code></pre>
+[br]
+
+[p][color=#00796B]ValidateQuantity.java (GET)[/color][/p]
+[p]This class contains a GET and POST request. The GET request is sent from [color=#00796B]product_details.js[/color], and it expects values for the sku and quantity parameters. A simple query is sent to [color=#e58a18]DBHelper[/color] to be executed, which asks for the sku and quantity of the product in the database. The quantity from the request and the quantity from the Vector of an array of Strings are then compared.[/p]
+[br]
+
+<pre><code class="language-java">
+public void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws IOException, ServletException {
+
+    ...
+
+    // Query to get quantity from specific sku
+    String query = "SELECT sku, quantity FROM product WHERE sku='"
+        + request.getParameter("sku") + "';";
+
+    Vector&lt;String[]&gt; productQuantityVector = DBHelper.runQuery(query);
+    if (productQuantityVector == null) {
+        out.print("error - null query response");
+        return;
+    }
+
+    String[] productQuantity = productQuantityVector.get(0);
+
+    if (Integer.parseInt(productQuantity[1]) - Integer.parseInt(request.getParameter("quantity")) < 0) {
+        out.print("invalid");
+    } else {
+        out.print("valid");
+    }
+}
+</code></pre>
+[br]
+
+[p]An example of the [color=#00796B]ProductDetails.jsp[/color] page, and adding a product with a quantity of 1 to the user's shopping cart.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_addtocart.gif[/img]
+[br]
+
+[h3]Order[/h3]
+[p][color=#00796B]order.jsp[/color] contains sections for the table that will show the list of products the user added to their cart, and an order summary section to the side which displays the costs, tax, and total. [color=#00796B]order.js[/color] starts an AJAX call to [color=#00796B]ProductDetailsAjax.java[/color]. This class is the same as [color=#00796B]ProductDetails.java[/color], only it returns the details of the products that the user added to their cart.[/p]
+[br]
+[p][color=#800000]attachButtonEvents()[/color] deals with the "save", "delete", and "cancel" buttons when the user wants to change the quantity of the product. The implementation is the same as that of CS545 Project 4, and will not be explained here.[/p]
+[br]
+[p]Also, the implementation of [color=#800000]updateTable()[/color] and [color=#800000]updateOrderSummary()[/color] are similar to building the HTML string for the grid item for each product explained earlier, and so only snippets of it will be shown here.[/p]
+[br]
+[list]
+    [*][color=#800000]updateTable()[/color] - builds the table of products that the user added to their cart. The product details are contained in the variable [color=#e58a18]currentListfProducts[/color], which was set after receiving a response from [color=#00796B]ProductDetailsAjax.java[/color].[/*]
+    [br]
+    [*][color=#800000]updateOrderSummary()[/color] - displays the shipping fee, the tax fee, the subtotal, and the total using the retail price of each relevant product.[/*]
+    [br]
+    [*][color=#800000]validateQuantity()[/color] - calls [color=#00796B]ValidateQuantity.java[/color] with POST. For every sku that is invalid, the item is marked and the user is notified that it should be removed from the cart before continuing to [color=#00796B]checkout.jsp[/color].[/*]
+[/list]
+[br]
+
+<pre><code class="language-javascript">
+// GET request to ProductDetailsAjax
+$(document).ready(function() {
+    ...
+    $.get('/jadrn025/servlet/ProductDetailsAjax', productDetailsHandler);
+    attachButtonEvents();
+
+    // Set up the checkout button
+    $('#order_summary button[name="checkoutButton"]').on('click', validateQuantity);
+});
+
+function productDetailsHandler(response) {
+    ...
+    var records = response.split('||');
+    for (var i = 0; i < records.length; i++) {
+        var recordInformation = records[i].split('|');
+        currentListOfProducts[i] = recordInformation;
+    }
+    updateTable();
+}
+
+function updateTable() {
+    ...
+    var tableString = "";
+    tableString += "&lt;table&gt;";
+
+    var usersProducts = cart.getCartArray();
+
+    for (var i = 0; i < currentListOfProducts.length; i++) {
+        // Find the quantity the user wants to purchase based on the sku of the current product
+        // being iterated over
+        var usersQuantity = 0;
+        for (var p = 0; p < usersProducts.length; p++) {
+            if (usersProducts[p][0] == currentListOfProducts[i][0]) {
+                usersQuantity = usersProducts[p][1];
+                break;
+            }
+        }
+
+        // Build the table row for each product
+        tableString += "...";
+    }
+
+    tableString += "&lt;/table&gt;";
+    var tableHandle = document.getElementById('order_table_div');
+    tableHandle.innerHTML = tableString;
+
+    updateOrderSummary();
+}
+
+function updateOrderSummary() {
+
+    var tableString = "";
+    var usersProducts = cart.getCartArray();
+    // Check if userProducts is empty
+
+    ...
+
+    // Tax is applied on the total, Shipping fee applied for each item
+    var taxMultiplier = 0.0775;
+    var shippingFee = 5.00;
+
+    var subTotal = 0;
+    for (var i = 0; i < usersProducts.length; i++) {
+        for (var p = 0; p < currentListOfProducts.length; p++) {
+            if (currentListOfProducts[p][0] == usersProducts[i][0]) {
+                var retailPrice = parseFloat(currentListOfProducts[p][6], 10);
+                var quantity = parseInt(usersProducts[i][1], 10);
+                subTotal += (retailPrice * quantity);
+            }
+        }
+    }
+
+    var shipping = (shippingFee * size);
+    var tax = ((subTotal + shipping) * taxMultiplier).toFixed(2);
+    var total = (subTotal + shipping + parseFloat(tax)).toFixed(2);
+
+    subTotal = subTotal.toFixed(2);
+    shipping = shipping.toFixed(2);
+
+    tableString += "...";
+
+    var tableHandle = document.getElementById('order_summary_div');
+    tableHandle.innerHTML = tableString;
+}
+
+function validateQuantity() {
+
+    var url = "/jadrn025/servlet/ValidateQuantity";
+    $.post(url, validateQuantityHandler);
+}
+
+function validateQuantityHandler(response) {
+
+    // If response is empty, proceed to checkout
+    if (!response.length) {
+        window.location.href = "/jadrn025/jsp_files/checkout.jsp";
+    }
+    else {
+        var listOfInvalidSkus = response.split("|");
+        $('#order_table_div table tr td:nth-child(3)').each(function() {
+            for (var i = 0; i < listOfInvalidSkus.length; i++) {
+                if (listOfInvalidSkus[i] == $(this).prop("id")) {
+
+                    // Set border to red for invalid item
+                    $(this).closest("tr").css({
+                        "border" : "1px solid #E50000"
+                    });
+                }
+            }
+        });
+        // show failure
+        ...
+    }
+}
+</code></pre>
+[br]
+
+[p][color=#00796B]ValidateQuantity.java (POST)[/color][/p]
+[p]Takes from the cookie passed in multiple sku and quantity values. [color=#e58a18]doPost()[/color] checks against the database to see if each sku's quantity is valid and if not, adds it to an ArrayList of skus to be marked as invalid. Serializes the sku into a String and sends it back.[/p]
+[br]
+
+<pre><code class="language-java">
+public void doPost(HttpServletRequest request, HttpServletResponse response)
+    throws IOException, ServletException {
+
+    // Get the list of "sku|quantity" pairs from the cookie,
+    // build the sql statement to query database for the sku and quantity
+    // of each product. Then run the query.
+    ...
+
+    // List of skus that are marked as invalid
+    ArrayList&lt;String&gt; listOfInvalidSkus = new ArrayList&lt;&gt;(skuQuantityPairs.length);
+    // For each record returned from query...
+    for (String[] product : productDetailsVector) {
+
+        // For each sku|quantity pair from the cookie
+        for (String pair : skuQuantityPairs) {
+
+            // Split pair and check that sku from cookie and from query is samw
+            String[] splitPair = pair.split("\\|");
+            if (splitPair[0].equals(product[0])) {
+
+                // If quantity from database subtracted to quantity from cookie is less than
+                // 0, then add to invalid list
+                if (Integer.parseInt(product[1]) - Integer.parseInt(splitPair[1]) < 0) {
+                    listOfInvalidSkus.add(splitPair[0]);
+                }
+            }
+        }
+    }
+
+    // Serialize the String to send back
+    StringBuffer skuBuffer = new StringBuffer();
+    for (String sku : listOfInvalidSkus) {
+        skuBuffer.append(sku + "|");
+    }
+    if (skuBuffer.length() > 0) {
+        skuBuffer.delete(skuBuffer.length() - 1, skuBuffer.length());
+    }
+    out.print(skuBuffer.toString());
+}
+</code></pre>
+[br]
+
+[p]The following shows the user going to the order page and changing the quantity of one of the purchases, then clicking "Check out" to navigate to the Checkout page where payment information is requested.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_orderchangequantity.gif[/img]
+[br]
+
+[p]A product can be deleted from the shopping cart, which will refresh the table.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_orderdeletefromcart1240.gif[/img]
+[br]
+
+[p]Multiple purchases can be made.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_orderaddtocartmultiple1240.gif[/img]
+[br]
+
+[h3]Checkout[/h3]
+[p][color=#00796B]checkout.jsp[/color] displays a form in which the user fills out in order to make a purchase. The form requires that the name, address, phone number, payment type, and credit cart information be completed. [color=#00796B]checkout.js[/color] contains the methods to validate these fields, and use the same logic, implementation, and regex to achieve this. The code is very similar to the code for CS545 Project 4, and so will not be explained here. However, it should be noted that on successful validation, the form calls [color=#00796B]OrderConfirmation.java[/color].[/p]
+[br]
+
+[p]The following shows the checkout form and submitting valid information, which ultimately navigates to [color=#00796B]OrderConfirmation.jsp[/color].[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_checkout1240.gif[/img]
+[br]
+
+[h3]Order Confirmation (Placing the order)[/h3]
+[br]
+
+[p][color=#00796B]OrderConfirmation.java[/color][/p]
+[br]
+
+[p]Servlet that takes the parameters in the form and displays it in a confirmation page. The following are shown by storing the values in an array of Strings and passing it to [color=#00796B]OrderConfirmation.jsp[/color] -[/p]
+[br]
+
+[list]
+    [*]Future date (set as 2 weeks from purchase date)[/*]
+    [*]Shipping Address[/*]
+    [*]Payment type[/*]
+    [*]Billing Address[/*]
+[/list]
+[br]
+
+[p]The order table and order summary are generated here, represented as an HTML string, and are also sent to the jsp in the String array. Because building the table and summary is similar to the examples previously mentioned, they will not be explained here. To create the table and order summary, the array [color=#e58a18]skuQuantityPairs[/color] and vector [color=#e58a18]productDetailsVector[/color] are passed to those functions. skuQuantityPairs is evaluated from the value of the cookie, with the sku and quantity of each of the product the user purchased. productDetailsVector contains details about each of the product, where each element in the vector is an array of Strings that convey information about the product.[/p]
+[br]
+
+<pre><code class="language-java">
+public void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws IOException, ServletException {
+
+    ...
+
+    // skyQuantityPairs array is retrieved from the cookie, represents sku and quantity of the user's purchases
+    // productDetailsVector contains the product details of each of the products from the cookie.
+
+    // Call methods that return appropriate strings to populate jsp file
+    String estimatedDelivery = buildEstimatedDelivery();
+    String shippingAddress = buildShippingAddress(request);
+    String payment = buildPayment(request);
+    String billingAddress = buildBillingAddress(request);
+    String checkoutTable = buildCheckoutTable(request, productDetailsVector, skuQuantityPairs);
+    String orderSummary = buildOrderSummary(request, productDetailsVector, skuQuantityPairs);
+
+    String[] confirmationDetails = {estimatedDelivery, shippingAddress, payment, billingAddress,
+                                    checkoutTable, orderSummary};
+
+    request.setAttribute("confirmationDetails", confirmationDetails);
+    RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/OrderConfirmation.jsp");
+    dispatcher.forward(request, response);
+}
+
+/*
+* Get future date from the current date
+*/
+private String buildEstimatedDelivery() {
+    // Get instance of Calendar, add 2 weeks to the current date
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.DAY_OF_YEAR, 14);
+    String futureDate = "&lt;p&gt;" + calendar.get(Calendar.MONTH) + "/" +
+        calendar.get(Calendar.DAY_OF_MONTH) + "/" + calendar.get(Calendar.YEAR) + "&lt;/p&gt;";
+
+    return futureDate;
+}
+
+/*
+* Build html string for the shipping address if it is available, else inform
+* that shipping address was the same as billing address
+*/
+private String buildShippingAddress(HttpServletRequest request) {
+    if (request.getParameter("shippingCheckbox") != null) {
+        return "&lt;p&gt;Same as billing address&lt;/p&gt;";
+    }
+
+    // Return if any necessary parameters were null
+    ...
+
+    StringBuffer buffer = new StringBuffer("&lt;p&gt;");
+    // Build the HTML to display the shipping address
+    ...
+    return buffer.toString();
+}
+
+/*
+* Build html string for payment type and card number. Chop off first 12 digits
+* of the card number and only reveal last 4 digits.
+*/
+private String buildPayment(HttpServletRequest request) {
+    ...
+
+    String paymentType = request.getParameter("radioPaymentType");
+    String cardNumber = request.getParameter("cardNumber");
+    cardNumber = cardNumber.substring(12, 16);
+
+    return "&lt;p&gt;" + paymentType + " ending in " + cardNumber + "&lt;/p&gt;";
+}
+
+/*
+* Build html string for billing address
+*/
+private String buildBillingAddress(HttpServletRequest request) {
+    ...
+
+    StringBuffer buffer = new StringBuffer("&lt;p&gt;");
+    // Build the HTML to display the billing address
+    ...
+    return buffer.toString();
+}
+
+/*
+* Build html string for the table
+* From productDetailsVector - Product, Description
+* From skuQuantityPairs - Quantity, Price (retail from product vector)
+*/
+private String buildCheckoutTable(HttpServletRequest request, Vector&lt;String[]&gt; productDetailsVector,
+                                String[] skuQuantityPairs) {
+    StringBuffer buffer = new StringBuffer("&lt;table&gt;&lt;tr&gt;&lt;th&gt;Product&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;" +
+        "&lt;th&gt;Quantity&lt;/th&gt;&lt;th&gt;Price&lt;/th&gt;&lt;/tr&gt;");
+
+    for (int i = 0; i < productDetailsVector.size(); i++) {
+
+        String[] product = productDetailsVector.get(i);
+        String[] splitPair = skuQuantityPairs[i].split("\\|");
+
+        double retail = Double.parseDouble(product[6]);
+        int quantity = Integer.parseInt(splitPair[1]);
+        double price = retail * quantity;
+
+        // Build the products table
+        buffer.append("...");
+    }
+    buffer.append("&lt;/table&gt;");
+
+    return buffer.toString();
+}
+
+/*
+* Build html string for the order summary
+* From productDetailsVector - getting retail price
+* From skuQuantityPairs - cart size, quantity, price
+*/
+private String buildOrderSummary(HttpServletRequest request, Vector&lt;String[]&gt; productDetailsVector,
+                                String[] skuQuantityPairs) {
+
+    // Find cart size by iterating through pairs taken from cookie and adding the quantity together
+    int cartSize = 0;
+    for (String pair : skuQuantityPairs) {
+        String[] splitPair = pair.split("\\|");
+        cartSize += Integer.valueOf(splitPair[1]);
+    }
+
+    // Find subtotal by iterating through productDetailsVector
+    double subTotal = 0;
+    for (int i = 0; i < productDetailsVector.size(); i++) {
+
+        String[] product = productDetailsVector.get(i);
+        String[] splitPair = skuQuantityPairs[i].split("\\|");
+
+        double retail = Double.parseDouble(product[6]);
+        int quantity = Integer.parseInt(splitPair[1]);
+        double price = retail * quantity;
+        subTotal += price;
+    }
+
+    double taxMultiplier = 0.0775;
+    double flatShippingFee = 5.00;
+
+    double shippingTotal = flatShippingFee * cartSize;
+    double taxTotal = taxMultiplier * (subTotal + shippingTotal);
+    double total = subTotal + shippingTotal + taxTotal;
+
+    // Set up the Strings for the order summary
+    String subtotalString = String.format("%.2f", subTotal);
+    String shippingTotalString = String.format("%.2f", shippingTotal);
+    String taxTotalString = String.format("%.2f", taxTotal);
+    String totalString = String.format("%.2f", total);
+
+    // Build order summary table
+    StringBuffer buffer = new StringBuffer("...");
+
+    return buffer.toString();
+}
+</code></pre>
+[br]
+
+[p]Clicking the "Place your order" button will call [color=#00796B]PlaceOrder.java[/color] and after a few seconds, redirect the user to the home page.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_orderconfirmation1240.gif[/img]
+[br]
+
+[h3]Multithreading - Handling changes in quantity of a product[/h3]
+[br]
+
+[p][color=#00796B]PlaceOrder.java[/color][/p]
+[p]Servlet expected to be called using AJAX from [color=#00796B]OrderConfirmation.jsp[/color]. The methods in this class are responsible for changing the value for the quantity of any products that the user purchased from the database.[/p]
+[br]
+
+[p]To begin, [color=#800000]placeOrderAndChangeQuantity()[/color] takes from the cookie passed in multiple sku and quantity values, checks against the database to see if each sku's quantity is valid, then adds any that aren't to an ArrayList of invalid skus. A valid sku is one in which its quantity, when subtracted from the quantity in the database, is greater than 0.[/p]
+[br]
+
+[p]If there aren't any invalid purchases, the change in the quantity is made for each product via an update query. The entire process must be synchronized in order to avoid data corruption due to race conditions. From comparing quantities of the cookie and quantities in the database, to subtracting the amount from the database, this entire process must occur subsequently from other client requests to the same servlet.[/p]
+[br]
+
+[p]The following shows either creating the update sql statement and sending it to the [color=#e58a18]DBHelper[/color] class or serializing the String of invalid skus and sending it back as a response.[/p]
+[br]
+
+<pre><code class="language-java">
+public void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws IOException, ServletException {
+    ...
+
+    // If nothing invalid, or nothing in list, go ahead and subtract quantity from
+    // database. Otherwise, serialize the string of invalid skus to send back.
+    if (listOfInvalidSkus.size() == 0) {
+        String answer = "";
+        for (String[] product : productDetailsVector) {
+            for (String pair : skuQuantityPairs) {
+                String[] splitPair = pair.split("\\|");
+                if (splitPair[0].equals(product[0])) {
+                    int newQuantity = Integer.parseInt(product[1]) - Integer.parseInt(splitPair[1]);
+                    String query = "UPDATE product SET quantity=" + String.valueOf(newQuantity) +
+                    " WHERE sku='" + product[0] + "';";
+                    answer = DBHelper.runUpdate(query);
+                }
+            }
+        }
+
+        out.print(answer);
+    }
+    else {
+        // Serialize the String to send back
+        StringBuffer skuBuffer = new StringBuffer();
+        for (String sku : listOfInvalidSkus) {
+            skuBuffer.append(sku + "|");
+        }
+        if (skuBuffer.length() > 0) {
+            skuBuffer.delete(skuBuffer.length() - 1, skuBuffer.length());
+        }
+        out.print(skuBuffer.toString());
+    }
+}
+</code></pre>
+[br]
+
+[h3]Search Functionality[/h3]
+[br]
+
+[p][color=#00796B]SearchProducts.java[/color][/p]
+[p]Expected to be called from [color=#00796B]menu_search.js[/color] when the user brought focus to the search bar, entered in a search keyword, and pressed enter on the keyboard. [color=#800000]buildResults()[/color] in this class calls the static method [color=#800000]runSearch()[/color] from the [color=#e58a18]DBHelper[/color] class and passes the search term. The vector of arrays of String objects are expected to be returned, which is then iterated over to construct an HTML String. This String is the same as the one used for the grid items when browsing and filtering products. The String is forwarded as the value for an attribute to [color=#00796B]search_products.jsp[/color] to plugged in and displayed.[/p]
+[br]
+
+[p][b]NOTE[/b]: the following contains code that leads to a security risk. This is elaborated further under "Improvements to consider".[/p]
+[br]
+
+<pre><code class="language-java">
+// DBHelper.java
+public static Vector&lt;String[]&gt; runSearch(String searchTerm) {
+    String answer = "";
+    Vector&lt;String []&gt; answerVector = null;
+
+    try {
+        StringBuffer buffer = new StringBuffer("SELECT sku, manufacturerID, vendor.name, category.name, description, " +
+            "retail, quantity, image FROM product, vendor, category WHERE product.venID = vendor.id " +
+            " AND product.catID = category.id AND (manufacturerID LIKE '%" + searchTerm + "%' OR vendor.name LIKE '%" +
+            searchTerm + "%' OR category.name LIKE '%" + searchTerm + "%' OR description LIKE '%" + searchTerm +"%');");
+
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        connection = DriverManager.getConnection(connectionURL);
+        statement = connection.createStatement();
+        resultSet = statement.executeQuery(buffer.toString());
+
+        ResultSetMetaData rsmd = resultSet.getMetaData();
+        answerVector = new Vector&lt;String []&gt;();
+
+        while(resultSet.next()) {
+            String [] row = new String[rsmd.getColumnCount()];
+            for(int i = 0; i < rsmd.getColumnCount(); i++) {
+                row[i] = resultSet.getString(i + 1);
+            }
+            answerVector.add(row);
+        }
+    }
+    catch(Exception error) {
+        error.printStackTrace();
+    }
+
+    // Closes resources if open.
+    ...
+}
+</code></pre>
+[br]
+
+[p]An example of searching for products with the keywords inputted.[/p]
+[br]
+
+[img]/projectdetailimages/cs645_project2_search.gif[/img]
+[br]
+
+[h2]Improvements to consider[/h2]
+[p]There are some improvements that I could make to this project.[/p]
+[br]
+
+[list]
+    [*]Binding values in SQL statements for the search query rather than placing the direct input inbetween wildcards. I could've use a prepared statement and the ? character in place of the inputs. It would be better to sanitize the input data before binding as well. This helps reduce the chances for sql injections and provide at least a decent form of security.[/*]
+    [br]
+    [*]Adding in busywait icons to notify the user that the data is being fetched (whenever they make an AJAX request).[/*]
+[/list]
+            

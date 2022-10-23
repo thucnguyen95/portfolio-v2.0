@@ -1,0 +1,1034 @@
+[h2]Assignment[/h2]
+[p]The app will allow users to register for classes. A student needs to enter their personal information - first name, last name, SDSU red id, email address and a password. The user can register for up to three courses and add themselves to waitlists for courses that are full. The student can also drop classes that they are registered for or drop themselves from waitlists.[/p]
+[br]
+
+[p]The app will allow students to select from a list of courses filtered via major (or subject like Computer Science, Physics, etc), level of the course (lower division - 100 & 200 level courses, upper division courses 300, 400, 500 level courses, and graduate courses (500 level and higher), and time of day (classes starting after a given time and/or ending before a given time). The server has a list of over 4,000 courses so you do not want to display all courses in one list.[/p]
+[br]
+
+[p]The app should display the courses the student is enrolled in and the courses that they are waitlisted for. The app should store the students personal data on the device so that they do not have to enter the data each time they use the app.[/p]
+[br]
+
+[h3]Server Interaction Overview[/h3]
+[p]A brief overview of the commands that you can send to the server and what they do for you.[/p]
+[br]
+
+[list]
+    [*][b]subjectlist[/b] - Returns a list of majors or subjects. Includes the name of the subject, the college it is in allowing the classes to be grouped by college.[/*]
+    [br]
+    [*][b]classidslist[/b] - Returns a list of courses based on subject(s), level, and time. Returns just the ids of the courses.[/*]
+    [br]
+    [*][b]classdetails[/b] - Given a course id returns information about the course: title, instructor, meeting time and place, etc.[/*]
+    [br]
+    [*][b]addstudent[/b] - Given the personal information about the student, added the student to the server so they can add classes.[/*]
+    [br]
+    [*][b]registerclass[/b] - Given a course id, student’s red id, and password, registers the student in the class.[/*]
+    [br]
+    [*][b]waitlistclass[/b] - If a class is full given a course id, student’s red id and password, adds the student to the wait list of a class. If a student drops the course the server does not enroll a student from the waitlist in the course.[/*]
+    [br]
+    [*][b]unregisterclass[/b] - Drops a student from the course.[/*]
+    [br]
+    [*][b]unwaitlistclass[/b] - Removes the student from a course waitlist.[/*]
+    [br]
+    [*][b]resetstudent[/b] - Drops the student from all courses and removes them from all waitlists.[/*]
+[/list]
+[br]
+
+[h3]Server Protocol[/h3]
+[p]When a request is successful it will return a response with the HTTP status 200. If there is a problem with the request the response will have a HTTP status of 404, 400, or 500. When you request a URL that does not exists you will get a 404 response and the body of the response will be HTML. This can happen when you mistype the URL. Other errors will return a response with a 400 or 404 status and the body of the response will be JSON. This can happen if you do not include a required parameter, misspell a parameter or the wrong type. All 200 responses have JSON data as bodies.[/p]
+[br]
+
+[p]If your URL is correct and all the required parameters are included the response will have HTTP status 200. If the values of your parameters are invalid, say an incorrect password, the response will contain a JSON object with the single key "error". Examples are given below.[/p]
+[br]
+
+[p]All the URLs are HTTPS.[/p]
+[br]
+
+[p]Note that the URLs given below are case sensitive. The path and all query parameter names are lower case. Also, the origin has been purposefully hidden.[/p]
+[br]
+
+[h3]URLs[/h3]
+[p][b]Subject (Major) list[/b]: Get a list of subject (majors) offered.[/p]
+[list]
+    [*][b]URL[/b]: {origin}/registration/subjectlist[/*]
+    [*][b]Method[/b]: GET only[/*]
+    [*][b]Parameter[/b]: None[/*]
+    [*][b]Returns[/b]: JSON array of JSON objects. Each JSON object contains 4 key-value pairs. The "title" is the name of the subject (or major or department). The "id" is used to get the list of classes in that subject (or major). "classes" is the number of classes in that subject. "college" is the college at SDSU to which the subject belongs.[/*]
+[/list]
+[br]
+[p]Sample return value (truncated to save space):[/p]
+<pre>
+[
+    {
+        "title": "Astronomy",
+        "id": 2,
+        "college": "Science",
+        "classes": 33
+    },
+    {
+        "title": "Computer Science",
+        "id": 8,
+        "college": "Science",
+        "classes": 65
+    }
+]
+</pre>
+[br]
+
+[p][b]Course Ids list[/b]: Get a list of IDs of courses that are in a given subject or major.[/p]
+[list]
+    [*][b]URL (GET)[/b]: {origin}/registration/classidslist?subjectid=AnInteger[/*]
+    [*][b]Method[/b]: GET or POST[/*]
+    [*][b]Parameters GET[/b]: subjectid, level, starttime, endtime[/*]
+    [*][b]Parameters POST[/b]: subjectids, level, starttime, endtime[/*]
+    [*][b]Returns[/b]: JSON array of integers. The integers are the ids of the classes that are in the given subject and meet the given criteria.[/*]
+[/list]
+[br]
+
+[p][b]Parameters Explained[/b][/p]
+[list]
+    [*]<u>subjectid</u> - required for GET, the id for the given subject obtained from the URL above. The request will return all the classes in the given subject that are in the subject that meet the given criteria.[/*]
+    [br]
+    [*]<u>subjectids</u> - required for POST, is a JSON array of subjects from the URL above. The request will return all the classes in the given subjects that are in the subject that meet the given criteria.[/*]
+    [br]
+    [*]<u>level</u> - optional. Three legal values: lower, upper, and graduate. lower will return classes in the given subject with course numbers between 100 and 299. upper will return classes in the given subject with course numbers between 300 and 599. graduate will return classes in the given subject with course numbers between 500 and 899.[/*]
+    [br]
+    [*]<u>starttime</u> - optional. Value is a string representing time in 24 hour format like "0930" and "2100". Note that in a GET URL there are no quotes around the number. If given, only courses that start at or after the given time will be returned. In the second example below all, CS courses that are graduate level (500 and above) that start at or after "1730" are returned.[/*]
+    [br]
+    [*]<u>endtime</u> - optional. Value is a string representing time in 24 hour format like "0930" and "2100". Note that in a GET URL there are no quotes around the number. If given only courses that end by or before the given time will be returned.[/*]
+[/list]
+[br]
+[p]Samples:[/p]
+[p]{origin}/registration/classidslist?subjectid=8[/p]
+[p]{origin}/registration/classidslist?subjectid=8&level=graduate&start-time=1730[/p]
+[br]
+<pre>
+Return value
+[7033,7036,7038,7041,7046,7049,7051,7052]
+</pre>
+[br]
+
+[p]Post Sample:[/p]
+[list]
+    [*]URL: {origin}/registration/classidslist[/*]
+    [*]Body: {"subjectids":[8], "level":"graduate", "starttime":"1730"}[/*]
+    [*]Content Type: Must be application/json[/*]
+[/list]
+[br]
+
+[p][b]Class Details[/b]: Get the details of a class.[/p]
+[list]
+    [*][b]URL (GET)[/b]: {origin}/registration/classdetails?classid=AnInteger[/*]
+    [*][b]Method[/b]: GET or POST[/*]
+    [*][b]Parameters GET[/b]: classid[/*]
+    [*][b]Parameters POST[/b]: classids[/*]
+    [*][b]Returns[/b]: GET version -JSON object with 22 key-value pairs.[/*]
+    [*][b]Returns[/b]: POST version -A JSON array of JSON objects with 22 key-value pairs.[/*]
+[/list]
+[br]
+[p][b]Parameters Explained[/b][/p]
+[list]
+    [*]classid - GET only. Id (integer) of the class obtained from the course id list url.[/*]
+    [*]classids - POST only. JSON array of integers - the Ids of the class obtained from the course id list url.[/*]
+[/list]
+[br]
+[p]GET Sample:[/p]
+[p]{origin}/registration/classdetails?classid=7036[/p]
+[br]
+[p]Post Sample:[/p]
+[list]
+    [*]URL: {origin}/registration/classdetails[/*]
+    [*]Body: {"classids":[7036]}[/*]
+    [*]Content Type: Must be application/json[/*]
+[/list]
+[br]
+[p]Sample output GET version. The meaning of most of the keys should be clear. "seats" is the number of students that are allowed to enroll in the course. "enrolled" is the number of students enrolled in the course. "Waitlist" is the number students in the waitlist for the class. Note that the values in quotes are strings. The values not in quotes are integers.[/p]
+[br]
+<pre>
+{
+    "description": "Principles, ....",
+    "department": "Computer Science",
+    "suffix": "",
+    "building": "GMCS",
+    "startTime": "1900",
+    "meetingType": "Lecture",
+    "section": "01",
+    "endTime": "2015",
+    "enrolled": 0,
+    "days": "TTH",
+    "prerequisite": "Computer Science 310.",
+    "title": "SOFTWARE INTERNATNLIZATN",
+    "id": 7036,
+    "instructor": "W. ROOT",
+    "schedule#": "21073",
+    "units": "3.0",
+    "room": "425",
+    "waitlist": 0,
+    "seats": 48,
+    "fullTitle": "Softwre Internationalization",
+    "subject": "CS",
+    "course#": "540"
+}
+</pre>
+[br]
+
+[p][b]Register a Student[/b]: Register a student for a class.[/p]
+[p]A student can only add a class once. A student can register for at most 3 classes. A student can not register for classes that meet at the same time.[/p]
+[list]
+    [*][b]URL (POST)[/b]: {origin}/registration/addstudent[br]
+    {"firstname":"Roger", "lastname":"Whitney", "redid":"123456003", "password":"password", "email":"whitney@sdsu.edu"}[/*]
+    [*][b]Method[/b]: POST.[/*]
+    [*][b]Parameters POST[/b]: firstname, lastname, redid, password, email.[/*]
+    [*][b]Returns[/b]: JSON object with one key, either "ok" or "error". See examples below.[/*]
+[/list]
+[br]
+[p][b]Parameters Explained[/b][/p]
+[list]
+    [*]<u>firstname</u> - String, first name of student[/*]
+    [br]
+    [*]<u>lastname</u> - String, last name of student[/*]
+    [br]
+    [*]<u>redid</u> - String, nine characters long. Only red ids already known to the server will be accepted. To avoid conflicts between students each students has a set of assigned red ids. Your set of red ids is any 9 digit string that ends with the same three digits as your SDSU red id. So if your red id is 822326003 then any red id from 000000003 through 999999003 will work. If you use an invalid redid the value returned will be[br]
+    {"error": "Invalid Red Id"}[/*]
+    [br]
+    [*]<u>password</u> - String and least 8 characters long and containing 7 different characters. If the password is not valid the returned value will be an error. For example:[br]
+    {"error": "Password too short"}[/*]
+    [br]
+    [*]<u>email</u> - String, a valid email address. If the email is not valid the return value will be a JSON object with the key "error". For example:[br]
+    {"error": "Invalid email no @" }[/*]
+[/list]
+[br]
+
+[p]Post Sample:[/p]
+[list]
+    [*]URL: {origin}/registration/addstudent[/*]
+    [*]Body:[br]
+    {"firstname":"Roger", "lastname":"Whitney", "redid":"123456003", "password":"password", "email":"whitney@sdsu.edu"}[/*]
+    [*]Content Type: Must be application/json[/*]
+    [*]Return: {"ok": "Student Added"}[/*]
+    [*]If the same request is repeated the return value is:[br]
+    {"error": "Red Id already in use"}[/*]
+    [*]Other error responses include:[br]
+    {"error": "Invalid Red Id"}[br]
+    {"error": "Password too short"}[br]
+    {"error": "Invalid email no @"}[/*]
+[/list]
+[br]
+
+[p][b]Register for a Class[/b]: Register a student in a class.[/p]
+[p]A student can only add a class once. A student can register for at most 3 classes. A student can not register for classes that meet at the same time.[/p]
+[list]
+    [*][b]URL (GET)[/b]: {origin}/registration/registerclass?redid=ARedId&password=APassword&courseid=ACourseID[/*]
+    [*][b]URL (POST)[/b]: {origin}/registration/registerclass[br]
+    {"redid": ARedId, "password": "APassword", "courseid":ACourseID}[/*]
+    [*][b]Method[/b]: GET or POST[/*]
+    [*][b]Parameters[/b] GET & POST: redid, password, courseid[/*]
+    [*][b]Returns[/b]: GET & POST version - JSON object with one key, either "ok" or "error"[/*]
+[/list]
+[br]
+[p][b]Parameters Explained[/b][/p]
+[list]
+    [*]<u>redid</u> - String, valid red id of a student already registered with server[/*]
+    [br]
+    [*]<u>password</u> - String, password of the registered student.[/*]
+    [br]
+    [*]<u>courseid</u> - Integer, id of the course to add the student to.[/*]
+[/list]
+[br]
+[p]GET Sample:[/p]
+[p]{origin}/registration/registerclass?redid=123459003&password=password&courseid=7036[/p]
+[br]
+[p]Sample Responses:[/p]
+<pre>
+{"ok": "Course added"}
+{ "error": "Student already in course"}
+</pre>
+[br]
+
+[p][b]Waitlist for a Class[/b]: Add a student to the waitlist for a class.[/p]
+[p]A student can only be added to the waitlist of a class once and only after the class is full. To aid in testing waitlisting, the courses with id 7034, 7035 and 7036 are full. Any attempt to add those courses will fail, but you can add students to the waitlist.[/p]
+[list]
+    [*][b]URL (GET)[/b]: {origin}/registration/waitlistclass?redid=ARedId&password=APassword&courseid=ACourseID[/*]
+    [*][b]URL (POST)[/b]: {origin}/registration/waitlistclass[br]
+    {"redid": ARedId, "password": "APassword", "courseid":ACourseID}[/*]
+    [*][b]Method[/b]: GET or POST[/*]
+    [*][b]Parameters[/b] GET & POST: redid, password, courseid[/*]
+    [*][b]Returns[/b]: GET & POST version - JSON object with one key, either "ok" or "error"[/*]
+[/list]
+[br]
+[p][b]Parameters Explained[/b][/p]
+[list]
+    [*]<u>redid</u> - String, valid red id of a student already registered with server[/*]
+    [br]
+    [*]<u>password</u> - String, password of the registered student.[/*]
+    [br]
+    [*]<u>courseid</u> - Integer, id of the course to add the student to the waitlist.[/*]
+[/list]
+[br]
+[p]GET Sample[/p]
+[p]{origin}/registration/waitlistclass?redid=123459003&password=password&courseid=7036[/p]
+[br]
+[p]Sample Responses:[/p]
+[p]{"ok": "Course added"}[/p]
+[br]
+
+[p][b]UnRegister a Class[/b]: Unregister a student in a class.[/p]
+[list]
+    [*][b]URL (GET)[/b]: {origin}/registration/unregisterclass?redid=ARedId&password=APassword&courseid=ACourseID[/*]
+    [*][b]URL (POST)[/b]: {origin}/registration/unregisterclass[br]
+    {"redid": ARedId, "password": "APassword", "courseid":ACourseID}[/*]
+    [*][b]Method[/b]: GET or POST[/*]
+    [*][b]Parameters[/b] GET & POST: redid, password, courseid[/*]
+    [*][b]Returns[/b]: GET & POST version - JSON object with one key, either "ok" or "error"[/*]
+[/list]
+[br]
+[p][b]Parameters Explained[/b][/p]
+[list]
+    [*]<u>redid</u> - String, valid red id of a student already registered with server[/*]
+    [br]
+    [*]<u>password</u> - String, password of the registered student.[/*]
+    [br]
+    [*]<u>courseid</u> - Integer, id of the course to remove the student from.[/*]
+[/list]
+[br]
+[p]GET Sample:[/p]
+[p]{origin}/registration/unregisterclass?redid=123459003&password=password&courseid=7036[/p]
+[br]
+[p]Sample Responses:[/p]
+[p]{"ok": "Course dropped"}[/p]
+[br]
+
+[p][b]Unwaitlist a Class[/b]: Remove a student from the waitlist of a class.[/p]
+[list]
+    [*][b]URL (GET)[/b]: {origin}/registration/unwaitlistclass?redid=ARedId&password=APassword&courseid=ACourseID[/*]
+    [*][b]URL (POST)[/b]: {origin}/registration/unwaitlistclass[br]
+    {"redid": ARedId, "password": "APassword", "courseid":ACourseID}[br]
+    Rest of the details are similar to unregister.[/*]
+[/list]
+[br]
+
+[p][b]Student classes[/b]: Returns list of class a student is registered in or in a waitlist.[/p]
+[list]
+    [*][b]URL (GET)[/b]: {origin}/registration/studentclasses?redid=ARedId&password=APassword[/*]
+    [*][b]URL (POST)[/b]: {origin}/registration/studentclasses[br]
+    {"redid": ARedId, "password": "APassword"}[/*]
+    [*][b]Method[/b]: GET or POST[/*]
+    [*][b]Parameters[/b] GET & POST: redid, password[/*]
+    [*][b]Returns[/b]: GET & POST version - On success a JSON object with two keys: "classes" and "waitlist". The values are a JSON array of class ids.[/*]
+    [*][b]Sample Result[/b]:[br]
+    { "classes": [7036], "waitlist": [] }[/*]
+[/list]
+[br]
+
+[p][b]Reset Student[/b]: Drops all students classes and and waitlisted classes.[/p]
+[list]
+    [*][b]URL (GET)[/b]: {origin}/registration/resetstudent?redid=ARedId&password=APassword[/*]
+    [*][b]URL (POST)[/b]: {origin}/registration/resetstudent[br]
+    {"redid": ARedId, "password": "APassword"}[/*]
+    [*][b]Method[/b]: GET or POST[/*]
+    [*][b]Parameters[/b] GET & POST: redid, password[/*]
+    [*][b]Returns[/b]: GET & POST version - On success a JSON object with one key: ok or error. error is returned when the password or red id is not correct.[/*]
+    [*][b]Sample Result[/b]:[br]
+    {:ok "Student reset"}[/*]
+[/list]
+
+[h2]Implementation Details[/h2]
+[h3]Signing In[/h3]
+[p]The activity starts by checking if a text file called "savedPersonalInformation.txt" exists in internal storage. If it does, the data is read as a String, and then split using the separator '|' into an array of Strings. This data is passed off to the RegistrationTabActivity, which is also navigated to. If not, a fragment transaction is done and the PersonalDataFragment is added for the user to input their information to be added to the server.[/p]
+[br]
+<pre><code class="language-java">
+private String readSavedFile() {
+    String fileContents;
+    try {
+        InputStream file = new BufferedInputStream(openFileInput("savedPersonalInformation.txt"));
+        byte[] data = new byte[file.available()];
+        file.read(data, 0, file.available());
+        fileContents = new String(data);
+        file.close();
+
+        String[] studentData = fileContents.split("\\|");
+        Intent toRegistrationTab = new Intent(this, RegistrationTabActivity.class);
+        toRegistrationTab.putExtra("studentData", studentData);
+        startActivity(toRegistrationTab);
+    }
+    else {
+        ...
+        PersonalDataFragment personalDataFragment = new PersonalDataFragment();
+        fragmentTransaction.add(R.id.fragmentContainer, personalDataFragment);
+        fragmentTransaction.commit():
+    }
+}
+</code></pre>
+[br]
+
+[p]PersonalDataFragment contains EditText fields for the user to register and be added as a student on the server. The following EditText fields have their values checked against certain conditions to validate the student.[/p]
+[list]
+    [*]First name - can't be empty[/*]
+    [*]Last name - can't be empty[/*]
+    [*]SDSU Id - must be 9 digits, checked using regex "^\d{9}$"[/*]
+    [*]Password - must be at least 8 characters[/*]
+    [*]Email - can't be empty[/*]
+[/list]
+[br]
+[p]If all input fields are valid, then a POST request is sent to the server to add the student. In order to sent a JsonObjectRequest, the url, JSONObject, and Response Listeners for both success and error cases are required. The key-value pairs containing the information of the student are used and stored in a JSONObject. Since this is asynchronous, execution of app functionality occurs only after a response is received from the server. Note that the Volley library was used to make these requests and add to the request queue.[/p]
+[br]
+<pre><code class="language-java">
+private void postRequestStudent() {
+    JSONObject data = new JSONObject();
+    try {
+        data.put("firstname", firstNameEdit.getText().toString());
+        data.put("lastname", firstNameEdit.getText().toString());
+        data.put("redid", firstNameEdit.getText().toString());
+        data.put("password", firstNameEdit.getText().toString());
+        data.put("email", firstNameEdit.getText().toString());
+    }
+    catch (JSONException error) {
+        return;
+    }
+
+    Response.Listener&lt;JSONObject&gt; success = new Response.Listener&lt;JSONObject&gt;() {
+        @Override
+        public void onResponse(JSONObject response) {
+
+            try {
+                String errorValue = response.getString("error");
+
+                // Display error messages if the string returned contains predefined words
+
+                // For invalid red id, error value is "Invalid Red id"
+                String redIdRegex = "(.*)Red Id(.*)";
+                if (Pattern.matches(redIdRegex, errorValue)) {
+                    // Note that the string was defined in the strings.xml file but is shown here
+                    displayErrorAndMessage(sdsuIDError, "The Red id is invalid.");
+                } else {
+                    sdsuIDerror.setVisibility(View.INVISIBLE);
+                }
+                ...
+                return;
+            }
+            catch (JSONException error) {
+                error.printStackTrace();
+            }
+
+            if (response.has("ok")) {
+                saveDataAndNavigate();
+            }
+        }
+    };
+    Response.ErrorListener failure = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            ...
+        }
+    };
+
+    String url = "{origin}/registration/addstudent";
+    JsonObjectRequest postRequest = new JsonObjectRequest(url, data, success, failure);
+    RequestQueue queue = Volley.newRequestQueue(this.getActivity());
+    queue.add(postRequest);
+}
+</code></pre>
+[br]
+
+[p]saveDataAndNavigate() calls the function to save the user's data in a text file by writing to internal storage, and then creates an intent to navigate to the RegistrationTabActivity.[/p]
+[br]
+
+[p][b]Note:[/b] the '|' separator was used to serialize the data, so it should be an invalid character as input when adding the student. This was not done here, but it should be to avoid the possibility of incorrect formatting when writing to the text file.[/p]
+[br]
+<pre><code class="language-java">
+private void saveDataAndNavigate() {
+    saveData();
+
+    String[] studentData = { firstNameEdit.getText().toString(), lastNameEdit.getText().toString(),
+        sdsuIDEdit.getText().toString(), passwordEdit.getText().toString(),
+        emailEdit.getText().toString() };
+
+    // Put data as extra in intent and navigate to RegistrationTabActivity
+    ...
+}
+
+private void saveData() {
+    String serializedData = firstNameEdit.getText().toString() + "|"
+        + lastNameEdit.getText().toString() + "|"
+        + sdsuIDEdit.getText().toString() + "|"
+        + passwordEdit.getText().toString() + "|"
+        + emailEdit.getText().toString();
+
+    writeSavedFile(serializedData);
+}
+
+private void writeSavedFile(String fileContents) {
+    try {
+        OutputStream file = new BufferedOutputStream(getActivity()
+            .openFileOutput("savedPersonalInformation.txt", Activity.MODE_PRIVATE));
+        file.write(fileContents.getBytes());
+        file.close();
+    }
+    catch (Exception noFile) {
+        ...
+    }
+}
+</code></pre>
+[br]
+
+[p]The following shows what the sign in screen looks like[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_signin.png[/img]
+</div>
+[br]
+
+[p]The user is directed to the courses and enrolled screen if signin was successful.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_signinvalid.gif[/img]
+</div>
+[br]
+
+[p]If any of the inputs are invalid, the text field will show red borders to indicate this.[/p]
+<!-- Image showing invalid sign in -->
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_signininvalid.png[/img]
+</div>
+[br]
+
+[p]The following shows the activity being killed after the user successfully signs in. The app is then launched again, and the sign in activity is skipped, demonstrating persistence (the sign in credentials are saved to a text file internally, and then checked against when the first activity is launched).[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_signinpersistence.gif[/img]
+</div>
+[br]
+
+[h3]RegistrationTabActivity[/h3]
+[p]This activity acts as the main screen for the user to perform the functionalities of the app. This activity extends from a FragmentActivity and contains an instance of type FragmentTabHost. It is in charge of hosting the fragment displaying the courses the user is enrolled in and the fragment where the user can filter the available courses.[/p]
+[br]
+
+[p]This activity in onCreate(), also checks if the key "studentData" exists in order to extract the array of Strings and initialize a StudentModel object which represents the current user.[/p]
+[br]
+
+[p]For this app, in order to populate the TextViews with the appropriate data for the subjects and classes, adapters were used with custom views being recycled. However, they will not be explained here. I wrote certain models to match the data to be shown.[/p]
+[br]
+
+[list]
+    [*]CourseModel - contains fields for the course units, number, title, department, instructor, days, start time, end time, meeting type, section number, building, room, prerequisite, description, seats, the number enrolled and the number waitlisted. This class also have multiple constructors to initialize these fields in a particular way depending on what various fragments need.[/*]
+    [br]
+    [*]FilterModel - contains fields for the filter title and the filter method, which is ultimately used in the filter adapter to display to the user whether or not he or she has filtered based on subject, level, or time, and the value the user set for those filters.[/*]
+    [br]
+    [*]StudentModel - this class represents the student object and contains fields for first name, last name, red id, password, email, and the classes the current student(user) is currently enrolled in and waitlisted in. The  class ids are stored in an array of int in this case. To easily pass this student object using intents, the model implements Parcelable.[/*]
+    [br]
+    [*]SubjectModel - contains fields for the title, id, college, and classes. It is used by the SubjectAdapter to populate the list view with information about the subject in FilterOptionsFragment.[/*]
+[/list]
+[br]
+
+[p]The following shows how StudentModel implements Parcelable -[/p]
+[br]
+<pre><code class="language-java">
+public class StudentModel implements Parcelable {
+    // PROPERTIES
+    private String firstName;
+    private String lastName;
+    private String redID;
+    private String password;
+    private String email;
+
+    private int[] coursesEnrolled;
+    private int[] coursesWaitlisted;
+
+    public StudentModel(...) {
+        ...
+    }
+
+    public StudentModel(Parcel parcel) {
+        this.firstName = parcel.readString();
+        this.lastName = parcel.readString();
+        this.redID = parcel.readString();
+        this.password = parcel.readString();
+        this.email = parcel.readString();
+
+        this.coursesEnrolled = parcel.createIntArray();
+        this.coursesWaitlisted = parcel.createIntArray();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(firstName);
+        parcel.writeString(lastName);
+        parcel.writeString(redID);
+        parcel.writeString(password);
+        parcel.writeString(email);
+
+        parcel.writeIntArray(coursesEnrolled);
+        parcel.writeIntArray(coursesWaitlisted);
+    }
+
+    public static final Parcelable.Create&lt;StudentModel&gt; CREATOR = new Parcelable.Creator&lt;StudentModel&gt;() {
+        @Override
+        public StudentModel createFromParcel(Parcel parcel) {
+            return new StudentModel(parcel);
+        }
+        @Override
+        public StudentModel[] newArray(int i) {
+            return new StudentModel[i];
+        }
+    }
+    ...
+}
+</code></pre>
+[br]
+
+[h3]Filtering Courses by subject, level, or time[/h3]
+[p]CoursesFragment will remain empty until the user has chosen a filter option. Thus, in onActivityResult(), getRequestClassIds() method will be fired to get an array of class ids of the appropriate classes that the user wants to view by subject, level, or time. The response from this call will be used as the argument for postRequestClassDetails(), another asynchronous method to get back an array of JSON objects containing the details of the filtered courses.[/p]
+[br]
+
+<pre><code class="language-java">
+@Override
+public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode != CoursesFragment.INTENT_TO_FILTER_ACTIVITY) {
+        return;
+    }
+    switch (resultCode) {
+        case Activity.RESULT_OK:
+            currentSubjectID = data.getIntExtra("subjectID", -1);
+            String level = data.getStringExtra("level");
+            String startTime = data.getStringExtra("startTime");
+            String endTime = data.getStringExtra("endTime");
+            if (currentSubjectID != -1) {
+                getRequestClassIds(level, startTime, endTime);
+            }
+            ...
+            break;
+    }
+}
+
+public void getRequestClassIds(String level, String startTime, String endTime) {
+    Response.Listener&lt;JSONArray&gt; success = new Response.Listener&lt;JSONArray&gt;() {
+        @Override
+        public void onResponse(JSONArray response) {
+            postRequestClassDetails(response);
+        }
+    };
+    Response.ErrorListener failure = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError) {
+            ....
+        }
+    };
+    certificateApplication.trustBismarckCertificate();
+    String url = "{origin}/registration/classidslist?subjectid="
+        + String.valueOf(currentSubjectID) + "&level=" + level
+        + "&starttime=" + startTime + "&endTime=" + endTime;
+    JsonArrayRequest getRequest = new JsonArrayRequest(url, success, failure);
+    RequestQueue queue = Volley.newRequestQueue(this.getActivity());
+    queue.add(getRequest);
+}
+
+public void postRequestClassDetails(JSONArray classIDs) {
+    final JSONObject data = new JSONObject();
+    try {
+        data.put("classids", classIDs);
+    }
+    catch (JSONException error) {
+        return;
+    }
+
+    ...
+        // In success listener
+        try {
+            String[] keysString = { "units", "course#", "title",
+                "instructor", "days", "startTime", "endTime" };
+            Strings[] keysInt = { "seats", "enrolled", "waitlist" };
+
+            for (int i = 0; i < response.length(); i++) {
+                JSONObject jsonObject = response.getJSONObject(i);
+
+                // Consider null values for the keys used
+                String[] stringValues = new String[keysString.length];
+                int[] intValues = new int[keysInt.length];
+
+                for (int keyIndex = 0; keyIndex < keysString.length; keyIndex++) {
+                    if (jsonObject.isNull(keysString[keyIndex])) {
+                        stringValues[keyIndex] = "";
+                    }
+                    else {
+                        stringValues[keyIndex] = jsonObject.getString(keysString[keyIndex]);
+                    }
+                }
+                for (int keyIndex = 0; keyIndex < keysInt.length; keyIndex++) {
+                    if (jsonObject.isNull(keysInt[keyIndex])) {
+                        intValues[keyIndex] = 0;
+                    }
+                    else {
+                        intValues[keyIndex] = jsonObject.getInt(keysInt[keyIndex]);
+                    }
+                }
+
+                CourseModel courseModel = new CourseModel(jsonObject.getInt("id"),
+                    stringValues[0], stringValues[1],
+                    stringValues[2], stringValues[3],
+                    stringValues[4], stringValues[5],
+                    stringValues[6], intValues[0],
+                    intValues[1], intValues[2]);
+            }
+            refreshCourseList();
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Error listener just prints the stack trace
+    ...
+    certificateApplication.trustBismarckCertificate();
+    String url = "{origin}/registration/classdetails";
+    // Custom JSONArrayRequest class
+    JsonArrayRequestWithJsonObject postRequest = mew JsonArrayRequestWithJsonObject(RequestMethod.POST,
+        url, data, success, failure);
+    RequestQueue queue = Volley.newRequestQueue(this.getActivity());
+    queue.add(postRequest);
+}
+</code></pre>
+[br]
+
+[p]The FilterOptionsActivity and FilterOptionsFragment will be briefly explained. The activity keeps in memory the filtering options that the user chose. For example, if the user decides to filter courses by subject and level, the activity will keep note of the specific subject and level. This information is sent from the fragment to its activity via an interface, by having the instance fire the method so that the listener(the activity) will call that method since it implements the interface. since Clicking the confirm button on this fragment will finish the activity and send these filtering parameters back to CoursesFragment via extras in the intent. The following is the GET request to get the available subjects that the user can choose as a filter.[/p]
+[br]
+
+<pre><code class="language-java">
+public void getRequestForSubjects() {
+    ...
+        // In success listener
+        try {
+            for (int i = 0; i < response.length(); i++) {
+                JSONObject jsonObject = response.getJSONObject(i);
+                SubjectModel subjectModel = new SubjectModel(jsonObject.getString("title"),
+                    jsonObject.getInt("id"), jsonObject.getString("college"),
+                    jsonObject.getInt("classes"));
+
+                listOfSubjects.add(subjectModel);
+            }
+            refreshList(FilterListViewData.SUBJECTS);
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Error listener just prints the error
+    ...
+
+    certificateApplication.trustBismarckCertificate();
+    String url = "{origin}/registration/subjectlist";
+    JsonArrayRequest getRequest = new JsonArrayRequest(url, success, failure);
+    RequestQueue queue = Volley.newRequestQueue(this.getActivity());
+    queue.add(getRequest);
+}
+</code></pre>
+[br]
+
+[p]The following shows the list view in the CoursesFragment being populated after the user filters by subject.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_filtercourse.gif[/img]
+</div>
+[br]
+
+[p]The following shows filtering courses by level.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_filterlevel.gif[/img]
+</div>
+[br]
+
+[p]The following shows filtering courses by time[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_filtertime.gif[/img]
+</div>
+[br]
+
+[p]The following shows filtering courses by all three - subject, level, and time.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_filtercourseleveltime.gif[/img]
+</div>
+[br]
+
+[h3]Enrolling and Waitlisting[/h3]
+[p]After filtering the courses and clicking on a specific course, whether in the CoursesFragment or EnrolledFragment, the class details for that course is shown. On this screen, the user can enroll, waitlist, or drop from a class. The following shows the GET request in CourseDetailFragment that was sent to retrieve the information for a specific class, using the class id.[/p]
+[br]
+
+<pre><code class="language-java">
+private void getRequestClassDetails(int classID) {
+    ...
+        // success listener
+        try {
+            String[] keysString = { "units", "course#", "title", "department", "instructor", "days",
+                "startTime", "endTime", "meetingType", "section", "building", "room",
+                "prerequisite", "description" };
+            String[] keysInt = { "seats", "enrolled","waitlist" };
+
+            // Consider null values for the keys used
+            String[] stringValues = new String[keysString.length];
+            int[] intValues = new int[keysInt.length];
+
+            for (int keyIndex = 0; keyIndex < keysString.length; keyIndex++) {
+                if (response.isNull(keysString[keyIndex])) {
+                    stringValues[keyIndex] = "";
+                }
+                else {
+                    stringValues[keyIndex] = response.getString(keysString[keyIndex]);
+                }
+            }
+            for (int keyIndex = 0; keyIndex < keysInt.length; keyIndex++) {
+                if (response.isNull(keysInt[keyIndex])) {
+                    intValues[keyIndex] = 0;
+                }
+                else {
+                    intValues[keyIndex] = response.getInt(keysInt[keyIndex]);
+                }
+            }
+
+            currentCourseModel = new CourseModel(response.getInt("id"),
+                stringValues[0], stringValues[1], stringValues[2]. stringValues[3],
+                stringValues[4], stringValues[5], stringValues[6], stringValues[7],
+                stringValues[8], stringValues[9], stringValues[10], stringValues[11],
+                stringValues[12], stringValues[13], intValues[0], intValues[1],
+                intValues[2]);
+
+            populateData();
+            determineCourseActionButton();
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // error listener, print error
+    ...
+    certificateApplication.trustBismarckCertificate();
+    String url = "{origin}/registration/classdetails?classid="
+        + String.valueOf(classID);
+    JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url,
+        success, failure);
+    RequestQueue queue = Volley.newRequestQueue(this.getActivity());
+    queue.add(getRequest);
+}
+</code></pre>
+[br]
+
+[p]Depending on the status of the class, if seats are available the user can enroll in the class by tapping enroll (if the class is completely filled and there are no seats available, then the user can instead waitlist). The method that will set the action button on the screen is determineCourseActionButton(), which does so by looking at the current fragment's parent activity and available seats.[/p]
+[br]
+
+[p]To enroll in the class, the classes that the current user is currently enrolled are waitlisted in must be retrieved first, in updateStudentClasses(). Conflicts are then validated by checking that the user isn't trying to enroll or waitlist in more than 3 classes and by checking to see if the class the user is trying to add has already been added. The following shows this process.[/p]
+[br]
+
+<pre><code class="language-java">
+private void updateStudentClasses() {
+    ...
+        // success listener
+        try {
+            JSONArray enrolledClasses = response.getJSONArray("classes");
+            JSONArray waitlistedClasses = response.getJSONArray("waitlist");
+
+            // Convert JSONArrays to array of ints
+            int[] enrolledClassesArray = new int[enrolledClasses.length()];
+            int[] waitlistedClassesArray = new int[waitlistedClasses.length()];
+            for (int index = 0; index < enrolledClassesArray.length; index++) {
+                enrolledClassesArray[index] = enrolledClasses.getInt(index);
+            }
+            for (int index = 0; index < waitlistedClassesArray.length; index++) {
+                waitlistedClassesArray[index] = waitlistedClasses.getInt(index);
+            }
+
+            // Set array of ints to the student model for enrolled and waitlisted classes
+            currentStudent.setCoursesEnrolled(enrolledClassesArray);
+            currentStudent.setCoursesWaitlisted(waitlistedClassesArray);
+
+            validateConflicts();
+        }
+    ...
+    String url = "{origin}/registration/studentclasses?redid="
+        + currentStudent.getRedID() + "&password=" + currentStudent.getPassword();
+    JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET,
+        url, null, success, failure);
+    RequestQueue queue = Volley.newRequestQueue(this.getActivity());
+    queue.add(getRequest);
+}
+</code></pre>
+[br]
+
+[p]A time conflict can occur among the classes that the user chooses to enroll or waitlist in. Thus, this is checked in postRequestTimeConflict() and thereafter in checkCourseTimeConflict(). First, the starting times and ending times of each enrolled or waitlisted class is stored in an array of ints. The current course the user is attempting to add then has its starting and ending times compared to the enrolled/waitlisted classes. If any of the ranges overlap, then the current class cannot be added.[/p]
+[br]
+
+<pre><code class="language-java">
+private void postRequestTimeConflict() {
+    JSONArray classIDs = new JSONArray();
+    for (int id : currentStudent.getCoursesEnrolled()) {
+        classIDs.put(id);
+    }
+    for (int id : currentStudent.getCoursesWaitlisted()) {
+        classIDs.put(id);
+    }
+
+    final JSONObject data = new JSONObject();
+    try {
+        data.put("classids", classIDs);
+    }
+    catch (JSONException error) {
+        return;
+    }
+    ...
+        // success listener
+
+        String[] listOfStartTimes = new String[response.length()];
+        String[] listOfEndTimes = new String[response.length()];
+        try {
+            for (int i = 0; i < response.length(); i++) {
+                JSONObject jsonObject = response.getJSONObject(i);
+                listOfStartTimes[i] = jsonObject.getString("startTime");
+                listOfEndTimes[i] = jsonObject.getString("endTime");
+            }
+        }
+        catch (JSONException error) {
+            error.printStackTrace();
+        }
+        checkCourseTimeConflict(listOfStartTimes, listOfEndTimes);
+    ...
+
+    String url = "{origin}/registration/classdetails";
+    JsonArrayRequestWithJsonObject postRequest = new JsonArrayRequestWithJsonObject(Request.Method.POST,
+        url, data, success, failure);
+    RequestQueue queue = Volley.newRequestQueue(this.getActivity());
+    queue.add(postRequest);
+}
+
+private void checkCourseTimeConflict(String[] startTimes, String[] endTimes) {
+    int currentCourseStartTime = Integer.parseInt(currentCourseModel.getCourseStartTime());
+    int currentCourseEndTime = Integer.parseInt(currentCourseModel.getCourseEndTime());
+
+    for (int index = 0; index < startTimes.length; index++) {
+        int startTime = Integer.parseInt(startTimes[index]);
+        int endTime = Integer.parseInt(endTimes[index]);
+
+        if ( (currentCourseStartTime >= startTime && currentCourseStartTime <= endTime) ||
+            (currentCourseEndTime >= startTime && currentCourseEndTime <= endTime) ) {
+            displayActionStatus(false, "Adding this class results in a time conflict.");
+            return;
+        }
+    }
+
+    // If validating succeeds, call getRequestClassAction() to proceed with adding/waitlisting
+    // the student
+    if (actionButtonState == CourseActionButtonState.ENROLL-IN_CLASS) {
+        String url = "{origin}/registration/registerclass?redid="
+            + currentStudent.getRedID() + "&password=" + currentStudent.getPassword()
+            + "&courseid=" + currentCourseModel.getCourseID();
+        getRequestClassAction(url);
+    }
+    else if (actionButtonState == CourseActionButtonState.WAITLIST_IN_CLASS) {
+        String url = "{origin}/registration/waitlistclass?redid="
+            + currentStudent.getRedID() + "&password=" + currentStudent.getPassword()
+            + "&courseid=" + currentCourseModel.getCourseID();
+        getRequestClassAction(url);
+    }
+}
+</code></pre>
+[br]
+
+[p]getRequestClassAction() is simply a method that initiates a GET request, using the url parameter that is set when calling the method. The method also checks if the response returned an error or if it returned ok, subsequently displaying the appropriate messages to the user.[/p]
+[br]
+
+[p]The following shows successful registration/enrollment for a class.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_register.gif[/img]
+</div>
+[br]
+
+[p]The following shows successfully waitlisting a full class.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_waitlist.gif[/img]
+</div>
+[br]
+
+[p]One example of a conflict that can occur, noted earlier, is when the user attempts to register for a class that he or she is already enrolled in. The user is notified as seen below.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_alreadyregistered.gif[/img]
+</div>
+[br]
+
+[p]The other conflict that can occur is when the user tries to enroll or waitlist in more than 3 courses, which is the fixed limit.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_courselimit.gif[/img]
+</div>
+[br]
+
+[h3]Dropping from Course or Waitlist[/h3]
+[p]Dropping from a class or from the waitlist is also done in CourseDetailFragment, but uses the following requests and urls.[/p]
+[br]
+
+<pre><code class="language-java">
+@Override
+public void onClick(View view) {
+    switch (view.getId()) {
+        case R.id.courseActionButton:
+            String url;
+            switch (actionButtonState) {
+                case DROP_FROM_CLASS:
+                    url = "{origin}/registration/unregisterclass?redid="
+                        + currentStudent.getRedID() + "&password="
+                        + currentStudent.getPassword() + "&courseid="
+                        + currentCourseModel.getCourseID();
+                    getRequestClassAction(url);
+                    break;
+                case DROP_FROM_WAITLIST:
+                    url = "{origin}/registration/unwaitlistclass?redid="
+                        + currentStudent.getRedID() + "&password="
+                        + currentStudent.getPassword() + "&courseid="
+                        + currentCourseModel.getCourseID();
+                    getRequestClassAction(url);
+                    break;
+                case ENROLL_IN_CLASS:
+                    updateStudentClasses();
+                    break;
+                case WAITLIST_IN_CLASS:
+                    updateStudentClasses();
+                    break;
+            }
+    }
+}
+</code></pre>
+[br]
+
+[p]The following shows the user dropping from the class.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_dropcourse.gif[/img]
+</div>
+[br]
+
+[p]The user can also drop from a class he or she is waitlisted in.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_dropwaitlist.gif[/img]
+</div>
+[br]
+
+[p]Clicking the reset button drops the current student from all enrolled or waitlisted courses.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_dropall.gif[/img]
+</div>
+[br]
+
+[h3]Data Persistence[/h3]
+[p]Not only is the signin credentials of the current user persisted even after the app is killed, the courses that the user is enrolled or waitlisted in is also persistent. The following shows the app being purposefully killed, after the user has enrolled in some courses, and then re-launched.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project4_datapersistence.gif[/img]
+</div>

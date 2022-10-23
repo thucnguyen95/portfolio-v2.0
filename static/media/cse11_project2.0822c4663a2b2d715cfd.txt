@@ -1,0 +1,583 @@
+[h2]Assignment[/h2]
+[p][b][u]Task 1: The DoubleArray11 class[/u][/b][/p]
+[p]You are being provided a skeleton of the DoubleArray11 class. It has been commented using Javadoc-style comments.[/p]
+[p](1) Download DoubleArray11.java[/p]
+[p](2) Generate the documentation using the javadoc command-line tool, to see the details of each constructor and public method.[/p]
+[p](3) Go through the signature of all the methods defined in the Javadoc and carefully read method description to understand its operation on the internal array.[/p]
+[p](4) Implement all methods correctly.[/p]
+[p](5) Put your name in the file after the existing Javadoc @author tag (replace YOUR NAME HERE)[/p]
+[br]
+
+[p][u]When you implement DoubleArray11. You may NOT:[/u][/p]
+[p](1) Change the signature of any [i]public[/i] method[/p]
+[p](2) Change the return type of any [i]public[/i] method[/p]
+[p](3) Add any new [i]public[/i] methods. You may add as many [i]private[/i] methods as you desire[/p]
+[p](4) Add any [i]public[/i] instance or class variables. All class/instance variables should declared [i]private[/i][/p]
+[p](5) Use any other pre-defined classes (e.g., Arrays, ArrayList,...) that provide similar functionality. Your implementation of [i]DoubleArray11[/i] should not have any other import statements than what has been provided to you in the skeleton[/p]
+[br]
+
+[p][u]You are allowed to add any number of your own private​ methods and variables.[/u][/p]
+[br]
+
+[p]As you look at the DoubleArray11 definition, it should be clear that:[/p]
+[p](1) [b]An instance of the class​[/b] internally stores an [b]array of ​doubles[/b]​. This instance variable makes up a key component of the state of an DoubleArray11 object.[/p]
+[p](2) The class must also [b]define methods that manipulate an instance’s internally-stored array​.[/b][/p]
+[p](3) For this assignment, the capacity of the internal array may be larger than the number of active elements. The first [i]size[/i] elements of the internal array are considered active.[/p]
+[p](4) You should also note, that in the skeleton, [i]boolean[/i] methods [b]always return false[/b]​. That is [b]clearly incorrect​[/b] in the full implementation. Those return values in the skeleton are present so that the initial code will compile.[/p]
+[p](5) Note the return types of the methods.[/p]
+[br]
+
+[p][b]Methods that return ​boolean[/b]​ should return true if method was successful, false if an error would occur. For example, if you attempted to insert at improper index is out of bounds, you should return false.[/p]
+[br]
+
+[p][b]Note : Your​ DoubleArray11​ implementation should never generate a runtime error[/b]. ​It must not print any error messages to the screen (though you will find such error messages ​useful during debugging). That means that you will need to check your arguments for valid values. Be sure to check that object references passed to your methods are not null.[/p]
+[br]
+
+[p]In the case of a constructor, if passed a null object pointer, you should create a valid instance in which the internal array has no capacity to store elements.[/p]
+[br]
+
+[p]Some hints for solving Task 1:[/p]
+[p](1) You may find an internal helper method that copies the contents of one array into another to be useful.[/p]
+[p](2) If the [i]insert[/i] method is invoked, and your internal array is full, you should create a new internal array with expanded capacity. Don’t forget to copy the original elements to your new internal array.[/p]
+[br]
+
+[p][b][u]Task 2: The DoubleArray11Main Program[/u][/b][/p]
+[p]This is a java program and therefore defines a [i]main()[/i] method. You are being provided a [i]DoubleArrayMain[/i] class that allows you to utilize/test instances of DoubleArray11. You will extend the DoubleArrayMain class to allow testing of all of the methods in DoubleArray11.[/p]
+[br]
+
+[p]You are being provided a partially-completed [i]DoubleArrayMain[/i] program. Don’t forget to put your name in the file after the existing Javadoc @author tag (replace YOUR NAME HERE)[/p]
+[br]
+
+[p]The main method contains a loop that processes commands that create and use methods of the DoubleArray11 class. Each command is a string input by the user, which is then interpreted by the loop, and causes some action to happen.[/p]
+[br]
+
+[p]The start of the interpreter sets up some initial variables, and the first thing the loop does is print a > character and wait for input:[/p]
+[br]
+<pre><code class="language-java">
+DoubleArray11 currentArray = new DoubleArray11();
+Scanner scan = new Scanner(System.in);
+String cmd = "";
+
+while (true) {
+    System.err.print("> ");
+    cmd = scan.nextLine();
+    String[] parts = cmd.split("\\s+");
+}
+</code></pre>
+[br]
+
+[p]The input is stored in cmd, and then it is split apart on whitespace. The expression cmd.split("\\s+")returns an array of strings, where each string returned is a fragment of cmd separated by whitespace from the others. So, for example[/p]
+[br]
+
+[p]"set 10 1.7".split("\\s+")[/p]
+[br]
+
+[p]would produce the array {"set", "10", "1.7"}[/p]
+[br]
+
+[p]The rest of the loop processes the array produced:[/p]
+<pre><code class="language-java">
+if (parts.length == 0) { continue; }
+switch (parts[0]) {
+    case "show":
+        System.out.println(currentArray.toString());
+        continue;
+    case "create":
+        if (parts.length != 2 || !isInt(parts[1])) {
+            printCreateUsage();
+            continue;
+        }
+        currentArray = new DoubleArray11(Integer.parseInt(parts[1]));
+        continue;
+}
+</code></pre>
+[br]
+
+[p]In particular, it matches the string in the first position in the array to see what command to run. In this snippet, we see that if the array starts with “show,” the current array will be printed (using its toString method). If the array starts with “create,” the interpreter expects the array to have a second element (index 1), which is an integer. If it doesn’t, it prints an error message and goes back to the top of the loop. If it does, it uses that as an argument to the constructor for [i]DoubleArray11[/i]. This will have the effect up updating the currentArray for future iterations of the loop.[/p]
+[br]
+
+[p]You will use these commands in two ways. First, you will extend the set of commands to cover all the methods on DoubleArray11. Second, you will use the commands to test your implementation and make sure it does what you expect.[/p]
+[br]
+
+[p][b]Adding Commands[/b][/p]
+[p]There are several commands already implemented that call methods, print values, and otherwise manipulate and inspect the array. You will add several more commands, using the examples given to develop the code that calls out to a method.[/p]
+[br]
+
+[p]These commands [u]should not print anything, just have the indicated effect:[/u][/p]
+[list]
+    [*]delete n -- deletes the item at index n in the current array using the delete method[/*]
+    [*]insert n d -- adds the element d at index n by using the insert method[/*]
+    [*]reverse-from start stop -- uses the reverse method to reverse the array from start to stop (which should be valid indices)[/*]
+    [*]reverse -- uses the reverse method to reverse the whole array[/*]
+    [*]swap n m -- uses the swap method to switch the values in n and m[/*]
+[/list]
+[br]
+
+[p]These commands should print their answer:[/p]
+[list]
+    [*]min -- uses the min method to print the min[/*]
+    [*]max -- uses the max method to print the max[/*]
+    [*]size -- uses the getSize method to print the current size of the array[/*]
+[/list]
+[br]
+
+[p][b]Using Commands to Test[/b][/p]
+[p]Running the program DoubleArrayMain after compiling it will allow you to quickly test particular methods. For example, you might have an interaction like this:[/p]
+[br]
+<pre>
+    $ java DoubleArrayMain
+    > show
+    []
+    > create 5
+    > append 2.3
+    > show
+    [ 2.30]
+    > append 4.4
+    > show
+    [ 2.30, 4.40]
+</pre>
+[br]
+
+[p]This would cause the toString() method to be called 3 times (once for each use of show), the constructor to be called once (for create), and append to be called twice. You could be confident in the basic behavior of append and the constructor after doing this, though there may be more cases to consider.[/p]
+[br]
+
+[p]It’s useful, once you’ve written a good test, to have a way to verify that it doesn’t break later. One way you can do this is by using a feature of the shell (the thing running in your terminal), to save a test and then run it later. You can create a file with one command per line, ending in exit, for example the test above would be written as:[/p]
+[br]
+
+<pre>
+    show
+    create 5
+    append 2.3
+    show
+    append 4.4
+    show
+    exit
+</pre>
+[br]
+
+[p]Then you can use the < shell operator to send that file to a program instead of user input (assuming the file was saved in test.txt):[/p]
+[br]
+
+[p]$ java DoubleArrayMain < test.txt[/p]
+[br]
+
+[p]This has the effect of running DoubleArrayMain, while treating the lines in test.txt as though you had typed them yourself. Each use of [i]scan.nextLine()[/i] will read a full line of the input file and process it as user input. This makes it so you can save the above test in a file, and re-run it easily without having to retype all the commands.[/p]
+[br]
+
+[p]It’s also useful to be able to run a number of tests at once, if you’ve saved several different files. We’ve given you some support for doing this with the script run_tests. If you run the command:[/p]
+[br]
+
+[p]$ ./run_tests[/p]
+[br]
+
+[p]The script will look for pairs of files named testinput1.txt, testoutput1.txt, testinput2.txt, testoutput2.txt, and so on. [b]It will run the main program on the inputs in the files named testinput, and compare the output to the corresponding testoutput file[/b]​. That is, DoubleArrayMain when reading testinput is expected to give output identical to the testoutput file. The run_tests program will report a success if they match, and a test error if they don’t. For example, success would look like:[/p]
+[br]
+<pre>
+    $ ./run_tests
+    Success for test tests/testinput1.txt
+    1 tests passed, 0 failed
+    </pre>
+                [br]
+                [p]while failure would look like:[/p]
+                [br]
+    <pre>
+    $ ./run_tests
+    Test tests/testinput1.txt failed, expected:
+    [ 2.30]
+    [ 2.30, 4.40]
+
+    but got:
+    []
+    []
+
+    0 tests passed, 1 failed
+</pre>
+[br]
+
+[p]We’ve provided one test to get you started, and starting out, this kind of failure is what you’ll see.[/p]
+[br]
+
+[p][b]You are required[/b] to submit test files along with your submission, and you will be graded on whether or not your tests are correct and thorough. Your tests, when taken together, should cover every command at least once in a meaningful way. “Meaningful” means, for example, that you if you want to test append, you should use it and then later use show to make sure that the element is present. You might use append without show to check that e.g. size works correctly, but you should also include a meaningful test for append. You should also check for error conditions – for example, test for getElement on an empty array, or for inserting at an invalid index.[/p]
+[br]
+
+[p]Submit exactly 6 different test files (testinput1.txt through testinput6.txt) with corresponding expected outputs (testoutput1.txt through testoutput6.txt), and among those files have at least one meaningful test for each command. In order to do so, you will actually use each command many times.[/p]
+[br]
+
+[p][i]Note[/i]: Testing also helps you make sure that your program is correct, and is a huge aid in debugging. We recommend that you run ./run_tests quite frequently when developing -- running it after each time you compile your program is not too often. Once you get a small number of tests passing, it becomes easy and fun to build on them and see how robust your implementation is, and you get the added benefit of being able to tell if anything breaks later when you go back to make other edits.[/p]
+[br]
+
+[p][b]To emphasize: The goal of this part of the assignment is for you to practice writing code that helps you in debugging. A good test should have a known outcome that you can verify​.[/b][/p]
+[br]
+
+[h2]Implementation Details[/h2]
+[p][color=#00796B]DoubleArray11.java[/color][/p]
+[br]
+
+[p][b]Constructors[/b][/p]
+[p]1) The default constructor without any arguments will initialize the instance variable [i]internal[/i] to a new array of doubles with no elements, [i]size[/i] to 0, and will increment the class variable nArray.[/p]
+[br]
+[p]2) The other constructor with argument capacity of type int, will initialize [i]internal[/i] as a new array of doubles whose size is the capacity.[/p]
+[br]
+[p]3) The third constructor which takes an array of type double will copy the elements in that array into [i]internal[/i].[/p]
+[br]
+[p][b]Note[/b] that the constant EXPANSION is used whenever a new expanded array is needed due to appending or inserting. The new array will have a size of the current size added to the constant, which was arbitrarily set at 10.[/p]
+[br]
+<pre><code class="language-java">
+public class DoubleArray11 {
+
+    public final int EXPANSION = 10;
+    ...
+    public DoubleArray11() {
+        internal = new double[0];
+        size = 0;
+        nArrays += 1;
+    }
+
+    public DoubleArray11(int capacity) {
+        internal = new double[capacity];
+        size = 0;
+        nArrays += 1;
+    }
+
+    public DoubleArray11(double[] dArray) {
+        size = dArray.length;
+        internal = new double[dArray.length];
+        for (int idx = 0; idx < dArray.length; ++idx) {
+            internal[idx] = dArray[idx]
+        }
+        nArrays += 1;
+    }
+}
+</code></pre>
+[br]
+
+[p][color=#800000]toString()[/color] - makes a String representation of the elements of the internal array.[/p]
+[br]
+
+[p][b]Getters and Setters[/b][/p]
+[p][color=#800000]getSize()[/color] - returns number of elements in array by returning instance variable [i]size[/i][/p]
+[br]
+[p][color=#800000]getCapacity()[/color] - returns capacity of internally stored array by returning [i]internal.length[/i][/p]
+[br]
+[p][color=#800000]getNArrays()[/color] - returns instance variable nArray, which was incremented every time any of the constructors of the class was called.[/p]
+[br]
+[p][color=#800000]getElement(int index)[/color] - returns element at the valid index. If invalid, returns Double.NaN[/p]
+[br]
+<pre><code class="language-java">
+public double getElement(int index) {
+    if ( (index >= 0) && (index <= (size - 1)) &&
+        (size > 0) && (internal != null) ) {
+
+        return internal[index];
+    }
+    else {
+        return Double.NaN;
+    }
+}
+</code></pre>
+[br]
+
+[p][color=#800000]getArray()[/color] - retrieves a copy of the internal stored array, note that this is a deep copy.[/p]
+[br]
+<pre><code class="language-java">
+public double[] getArray() {
+    double[] toReturn = new double[size];
+    for (int idx = 0; idx < size; ++idx) {
+        toReturn[idx] = internal[idx];
+    }
+    return toReturn;
+}
+</code></pre>
+[br]
+
+[p][color=#800000]setElement()[/color] - sets value of an element in the internal array[/p]
+[br]
+<pre><code class="language-java">
+public boolean setElement(int index, double element) {
+    if ( (index >= 0) && (index <= (size - 1)) &&
+        (size > 0) && (internal != null) ) {
+        internal[index] = element;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+</code></pre>
+[br]
+
+[p][b]Array manipulation methods[/b][/p]
+[list]
+    [*][color=#800000]append(double element)[/color] - appends the element given as the argument to the end of the array. Returns true if operation is successful. If internal array has no more capacity, then creates a new internal array.[/*]
+    [br]
+    [*][color=#800000]delete(int index)[/color] - deletes an element at the index given as the argument. Returns true if operation was successful.[/*]
+    [br]
+    [*][color=#800000]insert(int index, double element)[/color] - inserts an element to the array at the specified index. Expands capacity of internal array if needed. Returns true if operation was successful.[/*]
+    [br]
+    [*][color=#800000]reverse()[/color] - reverses the order of the first size elements in the internal array[/*]
+    [br]
+    [*][color=#800000]reverse(int start, int end)[/color] - reverses the order of the elements in the array from start to end, specified in the arguments. Valid indices are [0, (size - 1)], and start can be larger, smaller, or equal to end. Returns true if start and end index are valid.[/*]
+    [br]
+    [*][color=#800000]swap(int index1, int index2)[/color] - swaps two elements in the array. Returns true if index1 and index2 are valid.[/*]
+    [br]
+    [*][color=#800000]min()[/color] - returns the minimum value of the elements in the array. If there are no elements, returns Double.NaN[/*]
+    [br]
+    [*][color=#800000]max()[/color] - returns the maximum value of the elements in the array. If there are no elements, returns Double.NaN[/*]
+[/list]
+[br]
+
+    <pre><code class="language-java">
+    public boolean append(double element) {
+        if (internal != null) {
+            if ( (internal.length <= size) || (size == 0) ) {
+                internal = newExpandedArray(size + EXPANSION);
+            }
+            internal[size] = element;
+            size += 1;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean delete(int index) {
+        if ( (index >= 0) && (index <= (size - 1)) &&
+            (size > 0) && (internal != null) ) {
+            internal = newDeletedArray(index);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean insert(int index, double element) {
+        if ( (index >= 0) && (index <= size) &&
+            (internal != null) ) {
+            if ( (size == 0) || (index == size) ) {
+                append(element);
+                return true;
+            }
+            else {
+                if (size == internal.length) {
+                    internal = newExpandedArray(size + EXPANSION);
+                }
+                internal = newInsertedArray(index, element);
+                return true;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
+    public void reverse() {
+        for (int idx = 0; idx < (size / 2); ++idx) {
+            double temp = internal[idx];
+            internal[idx] = internal[(size - 1) - idx];
+            internal[(size - 1) - idx] = temp;
+        }
+    }
+
+    public boolean reverse(int start, int end) {
+        if ( (start >= 0) && (start <= (size - 1)) &&
+            (end >= 0) && (end <= (size - 1)) &&
+            (size > 0) && (internal != null) ) {
+
+            // if size is only 1, or start and end indices are
+            // the same, return true without changes
+            if ( (size == 1) || (start == end) ) {
+                return true;
+            }
+
+            // Sort so that the smaller number index is at start
+            int startIndex = 0;
+            int endIndex = 0;
+            if (start <= end) {
+                startIndex = start;
+                endIndex = end;
+            }
+            else {
+                startIndex = end;
+                endIndex = start;
+            }
+
+            // Range is relative
+            int rangeSize = ((endIndex - startIndex) + 1);
+            for (int idx = startIndex; idx < (startIndex +
+                (rangeSize / 2)); ++idx) {
+                double temp = internal[idx];
+                internal[idx] = internal[endIndex - (idx - startIndex)];
+                internal[endIndex - (idx - startIndex)] = temp;
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean swap(int index1, int index2) {
+        if ( (index1 >= 0) && (index1 < size) &&
+            (index2 >= 0) && (index2 < size) &&
+            (size > 1) && (internal != null) ) {
+            if (index1 == index2) {
+                return true;
+            }
+
+            double tempValue = internal[index1];
+            internal[index1] = internal[index2];
+            internal[index2] = tempValue;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public double min() {
+        if (size > 0) {
+            double minimum = internal[0];
+            for (int idx = 1; idx < size; ++ idx) {
+                if (internal[idx] < minimum) {
+                    minimum = internal[idx];
+                }
+            }
+            return minimum;
+        }
+        else {
+            return Double.NaN;
+        }
+    }
+
+    public double max() {
+        if (size > 0) {
+            double maximum = internal[0];
+            for (int idx = 1; idx < size; ++ idx) {
+                if (internal[idx] < maximum) {
+                    maximum = internal[idx];
+                }
+            }
+            return maximum;
+        }
+        else {
+            return Double.NaN;
+        }
+    }
+    </code></pre>
+[br]
+
+[p]The following are private helper methods that the public methods call. More specifically, the append method calls [i]newExpandedArray()[/i], the delete method calls [i]newDeletedArray()[/i], and the insert method calls [i]newInsertedArray()[/i].[/p]
+[br]
+
+[list]
+    [*][color=#800000]newExpandedArray()[/color] - if the internal array's size has reached the capacity, this method expands that capacity.[/*]
+    [br]
+    [*][color=#800000]newDeletedArray()[/color] - copies the elements of the internal array to a new array up until the index argument is reached. When it is reached, an iteration is skipped. Because the iteration was skipped, the subsequent elements of the internal array are set to the new array at the previous index. Before the method returns the new array of doubles, [i]size[/i] is decremented.[/*]
+    [br]
+    [*][color=#800000]newInsertedArray()[/color] - copies the elements of the internal array to a new array up until the index argument is reached. When it is reached, the new element is inserted at that position. The elements of the internal array are reached by using the previous iteration, which are then set to the new array at the current iteration. Before the method returns the new array of doubles, [i]size[/i] is decremented.[/*]
+[/list]
+[br]
+
+<pre><code class="language-java">
+private double[] newExpandedArray(int newSize) {
+    double[] expandedArray = new double[newSize];
+    for (int idx = 0; idx < size; ++idx) {
+        expandedArray[idx] = internal[idx];
+    }
+    return expandedArray;
+}
+
+private double[] newDeletedArray(int index) {
+    double[] deletedArray = new double[size];
+    for (int idx = 0; idx < size; ++idx) {
+        if (idx == index) {
+            continue;
+        }
+        else if (idx < index) {
+            deletedArray[idx - 1] = internal[idx];
+        }
+        else {
+            deletedArray[idx] = internal[idx];
+        }
+    }
+    size -= 1;
+    return deletedArray;
+}
+
+private double[] newInsertedArray(int index, double element) {
+    double[] insertedArray = new double[size + 1];
+    for (int idx = 0; idx < (size + 1); ++idx) {
+        if (idx == index) {
+            insertedArray[idx] = element;
+        }
+        else if (idx > index) {
+            insertedArray[idx] = internal[idx - 1];
+        }
+        else {
+            insertedArray[idx] = internal[idx];
+        }
+    }
+    size += 1;
+    return insertedArray;
+}
+</code></pre>
+[br]
+
+[p][color=#00796B]DoubleArrayMain.java[/color][/p]
+[p]This class contains methods that check that the input from the user has the correct number of arguments, and that the arguments are of the correct type depending on the command. It also contains methods that describe to the user what commands he or she can input, and how to input those commands.[/p]
+[br]
+<pre><code class="language-java">
+// Example of methods checking for bad usage
+private boolean checkBadCreateUsage(String[] parts) {
+    return parts.length != 2 || !isInt(parts[1]);
+}
+...
+
+// Example of methods pringing usage
+private void printCreateUsage() {
+    System.out.println("Usage: create n\n Creates a new array with
+        capacity n; n must be a number");
+}
+...
+</code></pre>
+[br]
+
+[p][color=#800000]runInterpreter()[/color] - the method that manages runs the bulk of the functionality. After getting the user input from the command line, it splits the String by detecting whitespace. It then checks equality of the String value of each part of the array to predetermined commands, and also checks that the arguments are of the expected type.[/p]
+[br]
+<pre><code class="language-java">
+// Example of commands "create" and "append"
+private void runInterpreter() {
+
+    DoubleArray11 currentArray = new DoubleArray11();
+    Scanner scan = new Scanner(System.in);
+    String cmd = "";
+
+    while (true) {
+        System.err.print("> ");
+        cmd = scan.nextLine();
+        String[] parts = cmd.split("\\s+");
+        if (parts.length == 0) { continue; }
+
+        switch (parts[0]) {
+            ...
+            case "create":
+                if (checkBadCreateUsage(parts)) {
+                    printCreateUsage();
+                    continue;
+                }
+                currentArray = new DoubleArray11(Integer.parseInt(parts[1]));
+                continue;
+            case "append":
+                if (checkBadAppendUsage(parts)) {
+                    printAppendUsage();
+                    continue;
+                }
+                currentArray.append(Double.parseDouble(parts[1]));
+                continue;
+            ...
+        }
+    }
+}
+</code></pre>

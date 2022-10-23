@@ -1,0 +1,264 @@
+[h2]Assignment[/h2]
+[p]This assignment introduces handling of touch events, 2D graphics, and using the accelerometer.[/p]
+[br]
+
+[h3]App Description[/h3]
+[p]When the user places one finger on the screen a circle is drawn on the screen. The center of the circle is placed where the user touched the screen. The circle can be the color of your choice. The circle can be solid or not, again your choice. The longer the finger is pressed the bigger the circle becomes. The user can put multiple circles on the screen by touching it multiple times. You should be able to support up to 15 different circles on the screen at a time.[/p]
+[br]
+
+[p]The drawing area for the circles will be the entire screen. You can keep the title bar at the top of the screen if you like. There is no need for menus or instructions on how to use the app.[/p]
+[br]
+
+[p]The user can set a circle in motion by placing a finger on a circle and swiping in any direction. The circles will start moving in direction and velocity indicated by the swipe. Different circles can be moving in different directions with different speeds.[/p]
+[br]
+
+[h3]Optional Parts[/h3]
+[p](1) When a circle reaches the edge of the screen it will bounce off the edge properly. That is it will lose some velocity and take into account the angle it strikes the edge. For example if the circle hits the edge at 90 degree angle it will bounce straight back. If it strikes the edge at a 45 degree angle it will bounce off at a 135 degree angle.[/p]
+[br]
+[p](2) Have the circles bounce off each other in a reasonable way when they collide. This will require some physics as to how two circles will react when they collide, which depends on the angle of their intersection, their velocities and their masses.[/p]
+[br]
+[p](3) When circles are moving use the accelerometer to modify the direction and velocity of a circle. As the user tilts or moves the phone the circles in motion need to respond to changes in the accelerometer. Keep in mind that the accelerometer gives you acceleration not velocity. The circle will be accelerated in the direction of the lower part of the device. If we tilt the top of the device down the circle will accelerate toward the top of the device. If the tilt is slight the acceleration is slight. If the circle is moving toward the bottom of the device when the device is tilted so that the top is lower than the bottom, the circle does not immediately start moving toward the top of the device.[/p]
+[br]
+
+[h2]Implementation Details[/h2]
+[p]There are three main classes that were written for this assignment - [color=#4169e1]CircleMainActivity[/color], [color=#4169e1]CircleCanvasView[/color], and [color=#4169e1]GrowingCircle[/color]. CircleMainActivity was the activity that implemented and handled the methods for touches and gestures done on the canvas. CircleCanvasView was a subclass of View and contained most of the logic. This custom view class was responsible for adding new circles to the list of circles it kept in memory as a property, for returning any circles touched, and for setting the new positions of each circle while taking into account any that hit the wall boundaries or other circles.[/p]
+[br]
+
+[h3][color=#00796B]CircleMainActivity.java[/color][/h3]
+[list]
+    [*][color=#800000]grow()[/color] - [color=#4169e1]newGrowingCircle[/color] will have its mass and radius incremented repeatedly by a constant amount until the handler for this method stops it.[/*]
+[/list]
+[br]
+
+[p]<u>Touch and Gesture Events</u>[/p]
+[br]
+[list]
+    [*][color=#800000]onTouch(View view, MotionEvent motionEvent)[/color] - passes any touch events to the gesture detector prior to handling the motion event itself. The only motion event handled here is the [color=#4169e1]ACTION_UP[/color] event which stops the new circle from growing. The overridden [color=#800000]onDown()[/color] is implemented instead of the [color=#4169e1]ACTION_DOWN[/color] event of the motion event from the touch listener because the gestures are handled first.[/*]
+    [br]
+    [*][color=#800000]onDown(MotionEvent motionEvent)[/color] - depending on the touch coordinates, the list of circles of the [color=#4169e1]canvasView[/color] object will be checked for any circles containing those coordinates. If a circle wasn't returned, then a new circle is instantiated with the touch coordinates as its x and y position, with the default radius, and with the default color. Otherwise, [color=#4169e1]focusedGrowingCircle[/color] will refer to the circle that was touched.[/*]
+    [br]
+    [*][color=#800000]onLongPress(MotionEvent motionEvent)[/color] - expected to occur after the "onDown" event, so the [color=#4169e1]newGrowingCircle[/color] property shouldn't be null. [color=#4169e1]circleGrowthHandler[/color] will run [color=#4169e1]growthRunnable[/color] which repeatedly calls [color=#800000]grow()[/color].[/*]
+    [br]
+    [*][color=#800000]onFling(MotionEvent motionEvent1, MotionEvent motionEvent2, float velocityX, float velocityY)[/color] - for whichever circle is focused, as determined by the CircleCanvasView object's [color=#800000]returnCircleTouched()[/color] method, its velocity in the x and y direction are set to the velocities of the fling.[/*]
+[/list]
+[br]
+
+[p]<u>Handlers and Runnables</u>[/p]
+[list]
+    [*][color=#664C90]Handler[/color]: allows processing of Runnable objects. The handlers are associated with a single thread (the main queue) and that thread's message queue. The Runnable is scheduled in the Handler's message queue with every call using [color=#800000]post()[/color] or [color=#800000]sendMessage()[/color].[/*]
+[/list]
+[br]
+
+[p]Two Runnable objects are created, one that is called in [color=#800000]onCreate()[/color] of this activity and is expected to be called continuously until the program ends. This is [color=#4169e1]positionRunnable[/color], which calls [color=#800000]updateCirclePositions()[/color] of the canvas view object. The second Runnable is [color=#4169e1]growthRunnable[/color], which calls [color=#800000]grow()[/color] allowing a new circle object to expand in radius until the user taps up.[/p]
+[br]
+
+[p]The following is code that deals with the Handler object which fires [color=#800000]postDelayed()[/color] to start or stop the runnables.[/p]
+[br]
+<pre><code class="language-java">
+private Handler circleGrowthHandler, circlePositionHandler;
+private static final long GROWTH_HANDLER_DELAY = 100;
+private static final long POSITION_HANDLER_DELAY = 100;
+
+private Runnable growthRunnable = new Runnable() {
+    @Override
+    public void run() {
+        grow();
+        circleGrowthHandler.postDelayed(this, GROWTH_HANDLER_DELAY);
+    }
+}
+
+private Runnable positionRunnable = new Runnable() {
+    @Override
+    public void run() {
+        canvasView.updateCirclePositions();
+        circlePositionHandler.postDelayed(this, POSITION_HANDLER_DELAY);
+    }
+}
+
+@Override
+onCreate(Bundle savedInstanceState) {
+    …
+    circleGrowthHandler = new Handler();
+    circlePositionHandler = new Handler();
+    circlePositionHandler.postDelayed(posiitonRunnable, POSITION_HANDLER_DELAY);
+}
+
+@Override
+onLongPress(MotionEvent motionEvent) {
+    circleGrowthHandler.postDelayed(growthRunnable, GROWTH_HANDLER_DELAY);
+}
+
+onTouch(View view, MotionEvent motionEvent) {
+    …
+    switch(MotionEvent.getAction()) {
+        case MotionEvent.ACTION_UP:
+        circleGrowthHandler.removeCallbacks(growthRunnable);
+    }
+}
+</code></pre>
+[br]
+
+[h3][color=#00796B]CircleCanvasView.java[/color][/h3]
+[p]Extends the View class so that it can draw on its own canvas. This class is responsible for keeping a list of all the circles and track their positions on the view, applying the appropriate velocities on each update loop.[/p]
+[br]
+
+[list]
+    [*][color=#800000]addCircle()[/color] - adds the circle (the argument is expected to be a reference to the new object) to listOfCircles.[/*]
+    [br]
+    [*][color=#800000]returnCircleTouched()[/color] - goes through the list of circles and returns a reference to the [color=#4169e1]GrowingCircle[/color] object that was touched by checking to see if the x and y coordinates making up the point of touch were contained in the circle's boundaries.[/*]
+    [br]
+    [*][color=#800000]updateCirclePositions()[/color] - expected to be called repeatedly by the handler in CircleMainActivity. Handles wall and circle collisions for each circle in the list and updates their velocities and positions on every call to the loop.[/*]
+    [br]
+    [*][color=#800000]onDraw()[/color] - for each circle in [color=#4169e1]listOfCircles[/color], the [color=#800000]drawOn()[/color] method of the [color=#4169e1]GrowingCircle[/color] object is called.[/*]
+[/list]
+[br]
+
+[p]Code snippet of the returnCircleTouched() and updateCirclePositions() methods.[/p]
+[br]
+<pre><code class="language-java">
+public GrowingCircle returnCircleTouched(float x, float y) {
+    GrowingCircle circleTouched = null;
+    for (GrowingCircle circle : listOfCircles) {
+        if (Math.pow(x - circle.getPositionX(), 2) + Math.pow(y - circle.getPositionY(), 2) <
+            Math.pow(circle.getRadius(), 2)) {
+            circleTouched = circle;
+            break;
+        }
+    }
+    return circleTouched;
+}
+
+public void updateCirclePositions() {
+    for (GrowingCircle circle : listOfCircles) {
+        float circleVelocityX = circle.getVelocityX();
+        float circleVelocityY = circle.getVelocityY();
+
+        // Wall Collisions
+        if (didHitWallX(circle) && (!isZero(circleVelocityX)) ) {
+            if (didVelocityTerminate(circleVelocityX)) {
+                circle.setVelocityX(0);
+            } else {
+                float velocityXAfterCollision = (circleVelocityX > 0) ? circleVelocityX - WALL_COLLISION_SPEED_LOSS :
+                circleVelocityX + WALL_COLLISION_SPEED_LOSS;
+                circle.setVelocityX((-1) * velocityXAfterCollision);
+            }
+        }
+        if (didHitWallY(circle) && (!isZero(circleVelocityY)) ) {
+            if (didVelocityTerminate(circleVelocityY)) {
+                circle.setVelocityY(0);
+            } else {
+                float velocityYAfterCollision = (circleVelocityY > 0) ? circleVelocityY - WALL_COLLISION_SPEED_LOSS :
+                circleVelocityY + WALL_COLLISION_SPEED_LOSS;
+                circle.setVelocityY((-1) * velocityYAfterCollision);
+            }
+        }
+
+        // Circle Collisions
+        handleCollisions();
+
+        // Set new positions of circles in the list
+        circle.setPositionX(circle.getPositionX() + circle.getVelocityX());
+        circle.setPositionY(circle.getPositionY() + circle.getVelocityY());
+    }
+    this.invalidate();
+}
+</code></pre>
+[br]
+
+[p]The following are methods that deal with collisions between two circles.[/p]
+[br]
+
+[list]
+    [*][color=#800000]handleCollisions()[/color] - iterates through the list of circles and compares each unique pair to check if any collided. Delegates to [color=#800000]detectCircleCollision()[/color] in order to determine this and calls [color=#800000]setVelocitiesAfterCollision()[/color] on the pair of circle objects that collided. Note that the algorithm used here is of O(n<sup>2</sup>) efficiency.[/*]
+    [br]
+    [*][color=#800000]detectCircleCollision()[/color] - uses the distance formula to determine if two circles are touching or intersecting. If they do then a collision has occurred.[/*]
+    [br]
+    [*][color=#800000]setVelocitiesAfterCollision()[/color] - fired after a collision occurs between two circles. The new velocities for each circle in the x and y direction are set.[/*]
+[/list]
+[br]
+
+[p]The following are methods that deal with collision between a circle and the boundaries of the canvas.[/p]
+[br]
+
+[list]
+    [*][color=#800000]didHitWallX()[/color] - returns true if the position of the circle has extended the boundary in the x direction.[/*]
+    [br]
+    [*][color=#800000]didHitWallY()[/color] - returns true if the position of the circle has extended the boundary in the y direction.[/*]
+    [br]
+    [*][color=#800000]didVelocityTerminate()[/color] - returns true if the velocity changed signs after either subtracting or adding it from or to the constant defined by [color=#4169e1]WALL_COLLISION_SPEED_LOSS[/color]. This constant was used to reduce the speed of the objects in a simple manner and was not meant to be a realistic representation of the loss in velocity or conservation of energy.[/*]
+[/list]
+[br]
+
+<pre><code class="language-java">
+    private void handleCollisions() {
+        // Collision with other circles
+        for (int circle1Index = 0; circle1Index < listOfCircles.size(); circle1Index++) {
+            GrowingCircle circle1 = listOfCircles.get(circle1Index);
+
+            for (int circle2Index = circle1Index + 1; circle2Index < listOfCircles.size(); circle2Index++) {
+                GrowingCircle circle2 = listOfCircles.get(circle2Index);
+
+                // If circles collide, change direction of their velocities
+                if (detectCircleCollision(circle1.getPositionX(), circle1.getPositionY(),
+                circle2.getPositionX(), circle2.getPositionY(),
+                circle1.getRadius(), circle2.getRadius())) {
+                    setVelocitiesAfterCollision(circle1, circle2);
+                }
+            }
+        }
+    }
+</code></pre>
+[br]
+
+[h3][color=#00796B]GrowingCircle.java[/color][/h3]
+[p]Defines an object that represents a filled circle to be drawn on the canvas. This class specifies properties such as the position (positionX, positionY), the velocity (velocityX, velocityY), the radius, the mass, and the color using Paint.[/p]
+[br]
+
+[p]Code for Growing Circle class.[/p]
+[br]
+
+<pre><code class="language-java">
+public class GrowingCircle {
+
+    // PROPERTIES //
+    private float mass = 10f;
+    private float positionX;
+    private float positionY;
+    private float velocityX;
+    private float velocityY;
+    private float radius;
+    private Paint paint;
+
+    // CONSTRUCTOR //
+    public GrowingCircle(float x, float y, float radius, Paint paint) {
+        this.positionX = x;
+        this.positionY = y;
+        this.radius = radius;
+        this.paint = paint;
+        this.velocityX = 0f;
+        this.velocityY = 0f;
+    }
+
+    public void drawOn(Canvas canvas) {
+        canvas.drawCircle(positionX, positionY, radius, paint);
+    }
+
+    // Getters and Setters
+    ....
+}
+</code></pre>
+[br]
+
+[h3]Running the App[/h3]
+[p]The following demonstrates the creation of circle objects created on user tap and hold.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project3_creatingcircles.gif[/img]
+</div>
+[br]
+
+[p]The following shows how circles collide with the walls which are the boundaries of the view, and with other circle objects.[/p]
+[br]
+<div class="mobile-image-wrapper-single">
+    [img]/projectdetailimages/cs64601_project3_collisions.gif[/img]
+</div>

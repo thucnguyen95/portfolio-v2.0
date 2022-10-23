@@ -1,0 +1,270 @@
+
+
+[h2]Assignment Details[/h2]
+[p]For this assignment, an online store website will be created and will feature products from a fictional company, [b]Bertha's Deluxe Chocolates[/b]. Based off of See's Candies, this company produces chocolates and confections which can be purchased online. The site must feature a page that lets users browse the products and a shopping cart that lets customers add and remove items. The assignment also requires a report page that lists all the orders placed, ordered by SKU, the stock keeping unit.[/p]
+[br]
+
+[p]The website must include the following:[/p]
+[list]
+[*]Links: [b]Home, Products, Order Online, About Us, Contact[/b][/*]
+[*][b]Home[/b]: returns user to landing page[/*]
+[*][b]Products[/b]: description of the types of candies available for order. Products are organized by category.[/*]
+[*][b]Order Online[/b]: order form to select types of chocolates to order and the quantity. The user must be able to change the quantity and remove items altogether. The total for an item should change when the user changes the quantity field. The form should show a grand total.[/*]
+[*][b]About Us[/b] and [b]Contact[/b] pages are static and contain fictional details.[/*]
+[/list]
+[br]
+
+[p]Products should be organized by the following categories:[/p]
+[list]
+    [*]Milk chocolate[/*]
+    [*]Dark chocolate[/*]
+    [*]Nuts and chews[/*]
+    [*]Brittles and Toffees[/*]
+    [*]Truffles[/*]
+    [*]Gifts[/*]
+    [*]Holiday assortments[/*]
+[/list]
+[br]
+
+[h4]The database[/h4]
+[p]The available products that the user can purchase are contained within a read-only table named products. The table must be queried to retrieve the products and populate the website.[/p]
+[p]The sales information to produce the report page is stored in a different database. The information stored is the SKU, date, and quantity of each purchase made by users, which are all inserted or updated to this database.[/p]
+[br]
+
+[p]The following shows the fields in the products table:[/p]
+[p]<em>mysql> describe products;</em>[/p]
+<table>
+    <tr>
+        <td>Field</td>
+        <td>Type</td>
+        <td>Null</td>
+        <td>Key</td>
+        <td>Default</td>
+        <td>Extra</td>
+    </tr>
+    <tr>
+        <td>sku</td>
+        <td>char(9)</td>
+        <td>NO</td>
+        <td>PRI</td>
+        <td>NULL</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>category</td>
+        <td>varchar(20)</td>
+        <td>YES</td>
+        <td></td>
+        <td>NULL</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>title</td>
+        <td>varchar(25)</td>
+        <td>YES</td>
+        <td></td>
+        <td>NULL</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>short_description</td>
+        <td>varchar(200)</td>
+        <td>YES</td>
+        <td></td>
+        <td>NULL</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>long_description</td>
+        <td>varchar(500)</td>
+        <td>YES</td>
+        <td></td>
+        <td>NULL</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>cost</td>
+        <td>decimal(6, 2)</td>
+        <td>YES</td>
+        <td></td>
+        <td>NULL</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>retail</td>
+        <td>decimal(6, 2)</td>
+        <td>YES</td>
+        <td></td>
+        <td>NULL</td>
+        <td></td>
+    </tr>
+</table>
+[p]<em>7 rows in set (0.00 sec)</em>[/p]
+[br]
+
+[h4]The Order Form[/h4]
+[p]The order form should have the following fields:[/p]
+                
+[p]- Billing Address[/p]
+[list]
+    [*]First Name[/*]
+    [*]Last Name[/*]
+    [*]Address (2 lines)[/*]
+    [*]City, State, and Zip Code[/*]
+    [*]Phone Number[/*]
+[/list]
+[p]- Shipping Address[/p]
+[list]
+    [*]First Name[/*]
+    [*]Last Name[/*]
+    [*]Address (2 lines)[/*]
+    [*]City, State, and Zip Code[/*]
+    [*]Phone Number[/*]
+[/list]
+[p]- Payment Type (Visa, Mastercard, Discover, American Express)[/p]
+[p]- Card Number[/p]
+[p]- Expiration Date[/p]
+[br]
+
+[h4]Additional Details[/h4]
+[p]Technologies and languages used must be HTML, Javascript or JQuery, Perl for all dynamic code, and the MySQL database. Perl cgi must be used for all dynamic code in this project. PHP is not allowed.[/p]
+[list]
+    [*]The application must cater to the user experience and be easily navigated and seamless.[/*]
+    [*]Javscript should be used creatively and AJAX appropriately to keep from refreshing the page.[/*]
+    [*]HTML, CSS, and JS files must be separated using external files and can not be embedded in the HTML file.[/*]
+    [*]$2.00 shipping fee is charged for each item.[/*]
+    [*]The tax rate in San Diego will be used (8.0%).[/*]
+    [*]The only information stored in the database to produce the report is the date, the sku, and the quantity.[/*]
+    [*]The [b]cost price[/b] should not be visible at all on the webpage, only the [b]retail price[/b].[/*]
+[/list]
+[br]
+[p]The customer should be directed to a confirmation page when submitting the order, and the confirmation should include details of the order. For example, the items ordered and total can be shown along with the billing and shipping address. The complete credit card number should not be shown, only the last 4 digits. The report page should show total sales and profit for each product sold and ordered by SKU. A grand total for gross sales and profit should be calculated and displayed.[/p]
+[br]
+
+[h2]Additional Notes[/h2]
+[list]
+    [*]Form should be validated in JS and in the script. Credit card numbers shouldn't have letters, and expiration date should be in the future.[/*]
+    [*]If client disables JS, cookies won't work so its information could instead be stored on the server and the script can print back actual pages with the shopping cart badge number visible and changed.[/*]
+    [*]Name the cookie the actual account number in jadrnxxx to avoid name clashes[/*]
+    [*]Empty out the shopping cart after the user paid for the products.[/*]
+    [*]Would add buttons dynamically but also have to attach handlers to those buttons. Do this through delegated events.[/*]
+    [*]Order online can be made a modal dialogue as an option.[/*]
+    [*]The quantity, stock number, and date must be stored in a table in the database jadrxxx on Opatija. Use this table to extract profit and sales information. Don't need a primary key, only transactions.[/*]
+[/list]
+[br]
+
+[p][color=#664C90]db file[/color]: comes with Perl and common on UNIX systems. Gives you a data structure that resides both on disk and in memory. For example, if you insert something to the shopping cart, it writes the data to disk but saves it in memory, and if you want to read it, there is no disk access. So it keeps in memory and on disk a synced copy of the shopping cart.[/p]
+[br]
+
+[h4]Ways for the client to send the serial number (token) back to the server[/h4]
+[list]
+    [*][color=#664C90]URL Rewriting[/color]: call the script and attach the parameter (serial number) onto the end of it.[/*]
+    [*][color=#664C90]Hidden input field[/color] in a form: input[type='hidden'], name = sessionID, value = the token given to the client by the server.[/*]
+    [*][color=#664C90]Cookies[/color]: most common way to save state. Have session cookies stored on the computer. Every time you connect, the cookie is sent automatically. Only need to write the statement document.cookie='$cookie'. The cookie will go even with AJAX calls. Essentially a single key-value pair.[/*]
+[/list]    
+[br]
+[p][b]Fields of a cookie[/b]:[/p]
+[list]
+    [*]name[/*]
+    [*]value - string with finite length (1024)[/*]
+    [*]expiration date[/*]
+    [*]path[/*]
+    [*]domain[/*]
+    [*]security flight[/*]
+[/list]    
+[br]
+
+[h2]Project Details[/h2]
+[p][b]Note[/b]: Unfortunately, the files of this project were taken off of the server, and I was unable to snap images or gifs of what it looked like. Thus, most of the functionality, such as retrieving the information for the products and displaying it dynamically, cannot be shown. However, I have included a few images of what the website looks like.[/p]
+[br]
+
+[h3]The Shopping Cart[/h3]
+[p][color=#00796B]shopping_cart.js[/color][/p]
+[p]This project revolved around the use of a shopping cart implemented as a cookie. For every submission that the user makes, whether it was adding products to the cart, changing the quantity, navigating to the page that shows all the products bookmarked, or deleting the product, the cookie had to be written to.[/p]
+[br]
+[p]A function is used to implement and describe an object, the shopping cart. It takes 'owner', which is the key of the cookie, as a parameter and sets it to the property [color=#e58a18]owner[/color]. The other properties are the [color=#e58a18]skuArray[/color] and the [color=#e58a18]qtyArray[/color], which are parallel arrays holding the sku of the product that the user added as well as the quantity for that product.[/p]
+[br]
+[list]
+    [*][color=#800000]getCookieValues()[/color] - splits up the raw string of the cookie and grabs the key-value pair that matches with the owner. Then splits up the each unique sku-quantity pair by using [color=#ff392e]split()[/color] and the separator '||'. Each individual sku-quantity pair was separated with '|', so they were split and appended to the parallel arrays.[/*]
+    [br]
+    [*][color=#800000]writeCookie()[/color] - builds the cookie string using the owner property and serializing each sku-quantity pair. Writes the cookie using [color=#ff392e]document.cookie = <i>"cookieString"</i>[/color][/*]
+    [br]
+    [*][color=#800000]add()[/color] - first calls [color=#ff392e]getCookieValues()[/color], then adds the sku and quantity to the shopping cart by either updating the sku of the product that already exists in the cart, or by appending the new product. Updating is done by accessing the [color=#e58a18]skuArray[/color] at the appropriate index and updating the [color=#e58a18]qtyArray[/color] using the same index. Adding is done by using [color=#ff392e]push()[/color] on both arrays. [color=#ff392e]writeCookie()[/color] is then called.[/*]
+    [br]
+    [*][color=#800000]setQuantity()[/color] - first calls [color=#ff392e]getCookieValues()[/color], then accesses the appropriate sku-quantity pair by matching the sku with the sku from the cookie. Sets the new quantity of that sku, then calls [color=#ff392e]writeCookie()[/color].[/*]
+    [br]
+    [*][color=#800000]delete()[/color] - first calls [color=#ff392e]getCookieValues()[/color]. In order for the product to be removed from the cart, the index of where the product is in the array had to be grabbed. It was then used in the [color=#ff392e]splice()[/color] method as the first parameter, with the second parameter being 1 to remove only 1 element in both arrays. If there was nothing in the cart after deletion, then the cookie was deleted. Otherwise, the cookie was written to.[/*]
+    [br]
+    [*][color=#800000]size()[/color] - returns the total number of products the user added to the cart by going through each element in [color=#e58a18]qtyArray[/color] and summimg up the quantities.[/*]
+    [br]
+    [*][color=#800000]getCartArray()[/color] - first calls [color=#ff392e]getCookieValues()[/color], then returns an array which contains both the [color=#e58a18]skuArray[/color] and the [color=#e58a18]qtyArray[/color] using [color=#ff392e]push()[/color]. Thus, [color=#e58a18]skuArray[/color] will be at index 0 and
+    [color=#e58a18]qtyArray[/color] at index 1.[/*]
+[/list]
+[br]
+
+[h3]Menu and Footer[/h3]
+[p]The menu and footer were included in each page the user can navigate to. The links were laid out horizontally. The shopping cart was placed at the top right of the menu and clicking on either the cart image or the number navigates to the Order Online page.[/p]
+[br]
+
+[h3]About and Contact[/h3]
+[p]The [color=#00796B]about.html[/color] and [color=#00796B]contact.html[/color] files were just static pages with fictional details about the company. A map using the Google Maps API was added to the contacts page and pinpoints the location of a See's Candies store, since Bertha's Deluxe Chocolates is fictional.[/p]
+[br]
+
+[img]/projectdetailimages/cs545_project4_about.png[/img]
+[br]
+[img]/projectdetailimages/cs545_project4_contact.png[/img]
+[br]
+
+[h3]Home Page[/h3]
+[p] [color=#00796B]index.html[/color], aside from displaying the header image, contains a preview of the products at the bottom of the page. This is dynamic in that the products returned to be displayed is random every time the page is loaded. In the JS file, the [color=#00796B]get_products.cgi[/color] script is run to retrieve the product information. A random number generator using the  [color=#ff392e]Math.random()[/color] JS method is used to get a random index to access the products array. The HTML string is built by accessing this products array and retrieving the respective product information, then lastly setting it to the [color=#ff392e]innerHTML[/color] property of the container.[/p]
+[br]
+
+[img]/projectdetailimages/cs545_project4_home.png[/img]
+[br]
+
+[h3]Products[/h3]
+[p][color=#00796B]product.html[/color] contains a sidebar on the left that lists options to filter out the products based on category. Each option, or input of type button, is attached an event handler that calls [color=#ff392e]addNewGrid()[/color] on click. This method uses the [color=#ff392e]determineFilter()[/color] method which will return the correct category string to compare to the categories in the products array (called [color=#e58a18]allProducts[/color]).[/p]
+[br]
+[p]The [color=#ff392e]attachButtonEvent()[/color] in [color=#00796B]products.js[/color] is an example of a fucntion that uses delegated events in JQuery. First, the event is attached to the div with the id <i>products</i>, then the second parameter of the [color=#ff392e]on()[/color] method takes a selector and filters the event to only be triggered on those child elements. In this case, the event is fired only for buttons in the grid item called "Add to Cart". The quantity specified in the text input is validated to match only digits and non-empty. On success of validation, a textbox appears notifying the user that the product and the quantity desired was successfully added to the shopping cart.[/p]
+[br]
+
+[h3]Order Online Checkout[/h3]
+[p]The [color=#00796B]orderonlinecheckout.html[/color] page displays a table with the product name, description, quantity, and price of each product in the shopping cart. For each product, the user is able to change the quantity then save or cancel, or delete the product completely.[/p]
+[br]
+[p]Similar to the products page, after the DOM has loaded, [color=#00796B]orderonlinecheckout.js[/color] calls [color=#ff392e]attachButtonEvent()[/color] which uses delegated events to dynamically attach event handlers to newly created elements. It uses the parent &lt;td&gt; element and traverses downwards to get a handle on child &lt;p&gt; or input text elements. This then allows for validation of the text input and for changes to the text of the quantity. Only the save and delete cases will change the information in the shopping cart (in the cookie) and will call [color=#ff392e]updateTable()[/color].[/p]
+[br]
+[p][color=#ff392e]updateTable()[/color] allows the table that contains the product information, quantity, and price to refresh. It updates the [color=#ff392e]innerHTML[/color] of the table container with new information from the shopping cart. After updating the table, it calls [color=#ff392e]updateOrderSummary()[/color].[/p]
+[br]
+[p][color=#ff392e]updateOrderSummary()[/color] updates the information in the order summary container which lists information about the total price, the shipping fees, and the tax. It also uses the [color=#ff392e]innerHTML[/color] property to refresh the order summary table. To take into account the format of the number, aimed to match 2 decimal places, the [color=#ff392e]toFixed()[/color] method is used on the number after calculations.[/p]
+[br]
+
+[h3]Order Online Payment[/h3]
+[p]The [color=#00796B]orderonlinepayment.html[/color] page shows a form the the user fills out, such as their name, phone number, and address. There is also an option that the user can check (via a checkbox) that allows them to fill out the shipping address if their billing address was different. There are also fields for the user to choose the type of credit card (radio buttons) and also text fields for the credit card name, number, expiration date, and CVC. These fields are all validated before being submitted.[/p]
+[br]
+[p]Implementation of the validation in [color=#00796B]orderonlinepayment.js[/color] is similar to Project 2, so only the validation for the credit card information will be explained.[/p]
+[br]
+[list]
+    [*][color=#800000]validatePaymentType()[/color] - checks if at least 1 radio button was clicked. Uses a conditional to check the ":checked" states of each button.[/*]
+    [br]
+    [*][color=#800000]validateCardName()[/color] - checks to see that the inputted text was not empty.[/*]
+    [br]
+    [*][color=#800000]validateCardNumber()[/color] - checks that the card number entered was 16 digits and not empty.[/*]
+    [br]
+    [*][color=#800000]validateExpiration()[/color] - checks that the month input matches the regex [0-1][0-9] and subsequently, that it is less than 12. Also checks that the year is 4 digits and the CVC is 3. The second conditional checks that the year entered is not less than the current year. If validation has successed so far, the next conditional considers the case in which the year is the same as the current year, but the month is less than the current month. Finally, the CVC is checked to be 3 digits and non-empty.[/*]
+[/list]
+[br]
+
+[h3]Order Online Confirmation[/h3]
+[p]The page, printed from the [color=#00796B]print_confirmation.cgi[/color] script, is a review of the information that the user submitted in the previous form. This page is navigated to after the user has submitted the form successfully. It displays the billing and shipping address, the product and quantity and price in a table, as well as a grand total including shipping costs and taxes in a container at the right.[/p]
+[br]
+[p][color=#00796B]print_confirmation.cgi[/color] first prints the cookie to the header. The Content-type line doesn't need to be specified because printing the cookie to the header already does that. All of the POST parameters are then set to local variables, and the estimated delivery date (set to 2 weeks from the current date) is calculated. The database that contains the products table is then connected to and the information from each field is retrieved.[/p]
+[br]
+[p]The price of the product, found by matching the sku from the cookie and the sku in the products table, was used along with the quantity that was saved in the cookie to calculate the total price. For each unique product the user ordered, a row was added to the table by building an HTML string. Using the subtotal, another HTML string was built to populate the order summary table. Afterwards, the entire HTML page was printed out with the built HTML strings embedded.[/p]
+[br]
+[p][color=#00796B]orderconfirmation.js[/color] gets the cookie value after the document is ready. What was interesting during my implementation of this was that the cookie and values that were sent to [color=#00796B]print_confirmation.cgi[/color] prior to running this javascript file, was encoded. therefore, in order to get the unencoded form of the cookie values back, [color=#ff392e]decodeURIComponent()[/color] was used. This decoded form was then written to the document cookie again in preparation for being sent to the [color=#00796B]place_order.cgi[/color] script.[/p]
+[br]
+[p][color=#00796B]place_order.cgi[/color] connects to a second database that contains information to construct the sales report. This includes the sku, date, and quantity. In order to get the current date, [color=#ff392e]localtime-&gt;mdy('/')[/color] was used to format the date with forward slashes. Something interesting to note is that if the sku already exists in the field in the database, then that record had to be updated rather than inserted into. This was done by checking to see if any of the records under the sku field matched the sku in the cookie.[/p]
+[br]
+
+[h3]Report Page[/h3]
+[p][color=#00796B]report.cgi[/color] outputs HTML that lists the sku, date, quantity, sales or revenue, and profit for each of the products that exist in the database. The grand total is specified at the bottom. In order for the correct information to be calculated and displayed, the script had to connect to both databases. First it connects to the jadrnxxx database to get the sku, date, and quantity that the users placed when making an order. It then connects to the proj4 database to get product information dealing with the sku, cost, and retail price from the products table. To get the revenue and profit to have a precision of 2 decimal places, [color=#ff392e]sprintf()[/color] was used with the first parameter set to "%.2f". The HTML string was then built and embedded in the document to print out.[/p]
