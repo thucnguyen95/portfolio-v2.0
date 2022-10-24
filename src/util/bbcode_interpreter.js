@@ -54,6 +54,44 @@ export async function parseBbcToHtml(inputFileName){
     if (!response.ok) throw new Error(`An error occurred: ${response.status}`);
     const text = await response.text();
 
-    const html = bbCodeParser.parse(text);
+    const modifiedText = prependPublicUrlToImgSrc(text);
+
+    const html = bbCodeParser.parse(modifiedText);
     return html;
+}
+
+function prependPublicUrlToImgSrc(text) {
+    const bbcTag = '[img]';
+    const textLength = text.length;
+    const indexesToPrepend = [];
+    for (let i = 0; i < textLength; i++) {
+        if (i + bbcTag.length > textLength) {
+            break;
+        }
+        if (text[i] === bbcTag[0] && 
+            text[i + 1] === bbcTag[1] &&
+            text[i + 2] === bbcTag[2] &&
+            text[i + 3] === bbcTag[3] &&
+            text[i + 4] === bbcTag[4]) {
+
+            indexesToPrepend.push(i + bbcTag.length);
+        }
+    }
+
+    const publicUrl = process.env.PUBLIC_URL;
+
+    let start = 0;
+    const slicedParts = [];
+    for (let idx = 0; idx < indexesToPrepend.length; idx++) {
+        const slicedText = text.slice(start, indexesToPrepend[idx]);
+        slicedParts.push(slicedText + publicUrl);
+        start = indexesToPrepend[idx];
+    }
+    if (indexesToPrepend.length > 0) {
+        const slicedText = text.slice(start);
+        slicedParts.push(slicedText);
+    }
+    
+    if (slicedParts.length > 0) return slicedParts.join('');
+    return text;
 }

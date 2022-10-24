@@ -2,7 +2,6 @@
 import React from 'react';
 import { css } from '@emotion/react';
 import { 
-    materialShadow, 
     materialParagraph, 
     materialMenu, 
     materialMenuTitle 
@@ -15,11 +14,17 @@ import {
     NavLink
 } from 'react-router-dom';
 
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import Box from '@mui/material/Box';
 
 import About from './components/about/about.js';
 import Projects from './components/projects/projects.js';
@@ -51,31 +56,12 @@ const cssFooter = css({
         alignItems: 'center',
     },
 });
-const cssMenu = css({
-    backgroundColor: '#FCFCFC',
-    position: 'sticky',
-    top: 0,
-    left: 0,
-    zIndex: 10,
-    width: '100%',
-    height: '64px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '8px 24px',
-    '> div:nth-of-type(1)': {
-        flexBasis: '70%',
+const cssAppbar = css({
+    '&.MuiAppBar-root': {
+        backgroundColor: '#FCFCFC',
     },
-    '> div:nth-of-type(2)': {
-        flexBasis: '30%',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    }
-});
+})
 const cssSocialMedia = css({
-    display: 'flex',
-    alignItems: 'center',
     margin: '0px 12px',
     '> div': {
         margin: '0px 8px',
@@ -98,12 +84,15 @@ class App extends React.Component {
             dateYear: new Date().getFullYear(),
             linkGithub: 'https://github.com/thucnguyen95',
             linkLinkedIn: 'https://www.linkedin.com/in/thucnguyen95/',
+            anchorEl: null,
         };
 
         // Bindings
         this.scrollToTop = this.scrollToTop.bind(this);
         this.openGithubLink = this.openGithubLink.bind(this);
         this.openLinkedInLink = this.openLinkedInLink.bind(this);
+        this.handleMenu = this.handleMenu.bind(this);
+        this.handleClose = this.handleClose.bind(this);
     }
 
     componentDidMount() {
@@ -119,33 +108,51 @@ class App extends React.Component {
     openLinkedInLink() {
         window.open(this.state.linkLinkedIn, '_blank');
     }
+    handleMenu(event) {
+        this.setState((state, props) => ({
+            anchorEl: event.target
+        }));
+    }
+    handleClose(event) {
+        this.setState((state, props) => ({
+            anchorEl: null
+        }));
+    }
 
     render() {
         return (
             <Router>
                 <div css={cssApp}>
                     {/* Menu */}
-                    <div css={[cssMenu, materialShadow]}>
-                        <div>
+                    <AppBar position="sticky" css={cssAppbar}>
+                        <Toolbar>
+                            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                                <MenuIcon color="primary" onClick={this.handleMenu}></MenuIcon>
+                            </Box>
+                            <Menu anchorEl={this.state.anchorEl} anchorOrigin={{vertical: 'bottom', horizontal: 'left'}} keepMounted open={this.state.anchorEl !== null} onClose={this.handleClose} css={materialMenu}>
+                                <MenuItem onClick={this.handleClose}><NavLink to="/projects">Projects</NavLink></MenuItem>
+                                <MenuItem onClick={this.handleClose}><NavLink to="/resume">Resume</NavLink></MenuItem>
+                                <MenuItem onClick={this.handleClose}><NavLink to="/hobbies">Hobbies</NavLink></MenuItem>
+                                <MenuItem onClick={this.handleClose}><NavLink to="/contact">Contact</NavLink></MenuItem>
+                            </Menu>
+                            
                             <h1 css={[materialMenuTitle, {marginLeft: '12px', marginRight: '12px'}]}><Link to="/">Portfolio</Link></h1>
-                        </div>
-                        <div>
-                            <nav css={materialMenu}>
+                            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'flex-end', alignItems: 'center' }} css={materialMenu}>
                                 <div><NavLink to="/projects">Projects</NavLink></div>
                                 <div><NavLink to="/resume">Resume</NavLink></div>
                                 <div><NavLink to="/hobbies">Hobbies</NavLink></div>
                                 <div><NavLink to="/contact">Contact</NavLink></div>
-                            </nav>
-                            <div css={cssSocialMedia}>
+                            </Box>
+                            <Box sx={{ flexGrow: { xs: 1, md: 0}, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }} css={cssSocialMedia}>
                                 <div>
                                     <IconButton aria-label="LinkedIn" onClick={this.openLinkedInLink}><LinkedInIcon></LinkedInIcon></IconButton>
                                 </div>
                                 <div>
                                     <IconButton aria-label="Github" onClick={this.openGithubLink}><GitHubIcon></GitHubIcon></IconButton>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                            </Box>
+                        </Toolbar>
+                    </AppBar>
     
                     {/* A switch looks through its children routes and renders first one that matches the current url */}
                     <div css={cssBody}>
@@ -163,20 +170,20 @@ class App extends React.Component {
                     {/* Footer */}
                     <div css={cssFooter}>
                         <div>
-                            <nav css={materialMenu}>
+                            <Box sx={{display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'flex-start', alignItems: 'center' }} css={materialMenu}>
                                 <div><Link to="/projects/:projectId">Projects</Link></div>
                                 <div><Link to="/resume">Resume</Link></div>
                                 <div><Link to="/hobbies">Hobbies</Link></div>
                                 <div><Link to="/contact">Contact</Link></div>
-                            </nav>
-                            <div css={cssSocialMedia}>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }} css={cssSocialMedia}>
                                 <div>
                                     <IconButton aria-label="LinkedIn" onClick={this.openLinkedInLink}><LinkedInIcon></LinkedInIcon></IconButton>
                                 </div>
                                 <div>
                                     <IconButton aria-label="Github" onClick={this.openGithubLink}><GitHubIcon></GitHubIcon></IconButton>
                                 </div>
-                            </div>
+                            </Box>
                         </div>
                         <br/>
                         <div css={[materialParagraph, {textAlign: 'center'}]}>

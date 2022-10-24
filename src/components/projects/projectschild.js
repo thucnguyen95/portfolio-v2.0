@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { Component } from 'react';
+import React from 'react';
 import {
     useParams
 } from 'react-router-dom';
@@ -12,6 +12,7 @@ import {
 import { parseBbcToHtml } from './../../util/bbcode_interpreter.js';
 import DOMPurify from 'dompurify';
 
+import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
 import Chip from '@mui/material/Chip';
@@ -94,44 +95,44 @@ const cssProjectContent = css({
         backgroundColor: '#0063cc',
         borderColor: '#0063cc',
     },
-    '.project-content': {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
+});
+
+const projectContent = css({
+
+});
+const projectContentSidebar = css({
+    padding: '8px 16px',
+    borderRight: '1px solid #D9D9D9',
+    '@media (max-width: 600px)': {
+        borderRight: 'none !important',
+    }
+});
+const projectTags = css({
+    'h2': [materialTitle, {
+        fontSize: '1.5em',
+        marginLeft: '4px',
+        marginRight: '4px',
+    }],
+});
+const projectContentBbc = css({
+    padding: '24px 36px',
+    // marginRight: '5%',
+    p: materialParagraph,
+    li: materialParagraph,
+    /* These are technically the same, but use both */
+    overflowWrap: 'break-word',
+    wordWrap: 'break-word',
+    ul: {
+        marginLeft: '5%',
     },
-    '.project-content-sidebar': {
-        flexShrink: 0,
-        width: '240px',
-        minHeight: '80vh',
-        padding: '8px 16px',
-        borderRight: '1px solid #D9D9D9',
+    'h1, h2, h3, h4, h5': {
+        color: '#424242',
+        lineHeight: '1.5em',
     },
-    '.project-tags': {
-        padding: '',
-        'h2': [materialTitle, {
-            fontSize: '1.5em',
-            marginLeft: '4px',
-            marginRight: '4px',
-        }],
-        
-    },
-    '.project-content-bbc': {
-        padding: '24px 36px',
-        marginRight: '5%',
-        p: materialParagraph,
-        li: materialParagraph,
-        ul: {
-            marginLeft: '5%',
-        },
-        'h1, h2, h3, h4, h5': {
-            color: '#424242',
-            lineHeight: '1.5em',
-        },
-        img: {
-            display: 'block',
-            width: '75%',
-            margin: '0 auto',
-        }
+    img: {
+        display: 'block',
+        width: '75%',
+        margin: '0 auto',
     },
     'pre': {
         backgroundColor: '#EFEFEF',
@@ -161,7 +162,6 @@ const cssProjectContent = css({
     },
 });
 
-
 function withParams(Component) {
     return props => <Component {...props} params={useParams()} />
 }
@@ -171,7 +171,6 @@ function withParams(Component) {
 // ============================================================================
 class ProjectsChild extends React.Component {
     constructor(props) {
-        console.log('ProjectsChild constructor');
         super(props);
 
         // Load current entry by projectId
@@ -211,7 +210,6 @@ class ProjectsChild extends React.Component {
                     const freelanceEntry = new FreelanceEntry(projId, title, description, startMonth, startYear, endMonth, endYear, fileName, category, tags, company, location, website, backgroundImage);
                     entry = freelanceEntry;
                 }
-                console.log(jsonProject);
                 break;
             }
         }
@@ -238,7 +236,6 @@ class ProjectsChild extends React.Component {
     }
 
     async componentDidMount() {
-        console.log('ProjectsChild componentDidMount()');
         window.scrollTo({top: 0, left: 0, behavior: 'smooth'});
 
         if (!this.state.entry) return;
@@ -256,9 +253,7 @@ class ProjectsChild extends React.Component {
     }
 
     async onInitiateBbcInterpreter(fileName) {
-        console.log('onInitiateBbcInterpreter()');
         const html = await parseBbcToHtml(fileName);
-        console.log('Got back html: ', html);
 
         this.setState((state, props) => ({
             parsedHtml: html,
@@ -315,9 +310,9 @@ class ProjectsChild extends React.Component {
                     </div>
                 </div>
             </div>
-            <div className="project-content">
-                <div className="project-content-sidebar">
-                    <div className="project-tags">
+            <Grid container css={projectContent}>
+                <Grid item xs={12} md={2} css={projectContentSidebar}>
+                    <div css={projectTags}>
                         <h2>Skills</h2>
                         {this.state.entry.getTags().map((s) => 
                             <Chip key={'chipkey-' + s} label={s} variant="outlined" color={
@@ -326,9 +321,11 @@ class ProjectsChild extends React.Component {
                                 (this.state.tagsToCategoryMap[s] === 'OTHER') ? "secondary" : "primary"} css={{ margin: '2px 4px'}}/>
                         )}
                     </div>
-                </div>
-                <div className="project-content-bbc" dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(this.state.parsedHtml)}}></div>
-            </div>
+                </Grid>
+                <Grid item xs={12} md={10}>
+                    <div css={projectContentBbc} dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(this.state.parsedHtml)}}></div>
+                </Grid>
+            </Grid>
         </div>
         );
     }

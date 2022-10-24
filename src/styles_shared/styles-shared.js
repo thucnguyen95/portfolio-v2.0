@@ -8,7 +8,7 @@ export const materialShadow = css({
 });
 export const materialTitle = css({
     color: '#616161',
-    fontSize: '1.8em',
+    fontSize: '1.8rem',
     lineHeight: '1.6em',
     marginTop: '8px',
     marginBottom: '8px',
@@ -41,8 +41,8 @@ export const materialNavLink = css({
 
 // Composed Units
 export const materialMenu = css({
-    display: 'flex',
-    justifyContent: 'start',
+    // display: 'flex',
+    // justifyContent: 'start',
     '> div': { margin: '0px 12px' },
     'a': materialNavLink,
     'a.active': {
@@ -103,18 +103,23 @@ export const materialCarousel = css({
         backgroundColor: '#FFFFFF',
         width: '85%',
         maxWidth: '3024px',
-        maxHeight: '405px',
+        // maxHeight: '405px',
     },
     '.carousel-image-wrapper': {
-        minWidth: '160px',
-        maxWidth: '1040px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        // border: '1px dashed red',
+        // margin: '12px 0px',
         img: {
             display: 'block',
             width: '80%',
             height: '100%',
+            minWidth: '160px',
+            maxWidth: '1040px',
             maxHeight: '320px',
             objectFit: 'contain',
-            margin: '0 auto',
+            // margin: 'auto',
         }
     },
     '.carousel-content-wrapper': {
@@ -122,8 +127,8 @@ export const materialCarousel = css({
     },
     h2: materialTitle,
     '.carousel-content-sub-wrapper': {
-        display: 'flex',
-        justifyContent: 'space-between',
+        // display: 'flex',
+        // justifyContent: 'space-between',
         margin: '8px 0px 24px',
     },
     '.carousel-content-subtitle': materialParagraph,
@@ -139,12 +144,12 @@ export const materialCarousel = css({
 });
 export const materialPanel = css({
     '.panel-image-wrapper': {
-        minWidth: '320px',
-        maxWidth: '720px',
-        maxHeight: '360px',
+        // maxHeight: '360px',
         img: {
             display: 'block',
             width: '100%',
+            minWidth: '300px',
+            // maxWidth: '720px',
             height: '100%',
             objectFit: 'cover',
         },

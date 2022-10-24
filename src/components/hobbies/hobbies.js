@@ -21,7 +21,6 @@ import HobbiesGames from './../../assets/images/hobbies-games.jpg';
 const cssPanel = css({
     backgroundColor: '#FFFFFF',
     maxWidth: '3024px',
-    maxHeight: '405px',
     margin: '24px auto 96px',
 });
 
@@ -58,14 +57,14 @@ class Hobbies extends React.Component {
             <h1 css={[materialTitle]}>Hobbies</h1>
             <div>
                 <Grid container css={[cssPanel, materialPanel, materialShadow]}>
-                    <Grid item xs={4} className="panel-image-wrapper">
+                    <Grid item xs={12} md={4} className="panel-image-wrapper">
                         <img src={HobbiesDeveloping} alt="Hobbies - Developing" 
                             onLoad={(e) => this.onImageLoaded(0, e)} 
                             style={(this.state.arrayLoadedImages[0] ? {display: 'block'} : { display: 'none' })} />
                         <Skeleton variant="rectangular" className="image-skeleton" 
                             style={(this.state.arrayLoadedImages[0] ? {display: 'none'} : { display: 'block' })}></Skeleton>
                     </Grid>
-                    <Grid item xs={8} container direction="column" className="panel-content-wrapper">
+                    <Grid item xs={12} md={8} container direction="column" className="panel-content-wrapper">
                         <Grid item xs={10}>
                             <h2>Developing</h2>
                             <div className="panel-content-description">
@@ -83,14 +82,14 @@ class Hobbies extends React.Component {
                 </Grid>
 
                 <Grid container css={[cssPanel, materialPanel, materialShadow]}>
-                    <Grid item xs={4} className="panel-image-wrapper">
+                    <Grid item xs={12} md={4} className="panel-image-wrapper">
                         <img src={HobbiesReading} alt="Hobbies - Reading" 
                             onLoad={(e) => this.onImageLoaded(1, e)} 
                             style={(this.state.arrayLoadedImages[1] ? {display: 'block'} : { display: 'none' })}/>
                       <Skeleton variant="rectangular" className="image-skeleton" 
                             style={(this.state.arrayLoadedImages[1] ? {display: 'none'} : { display: 'block' })}></Skeleton>
                     </Grid>
-                    <Grid item xs={8} container direction="column" className="panel-content-wrapper">
+                    <Grid item xs={12} md={8} container direction="column" className="panel-content-wrapper">
                         <Grid item xs={10}>
                             <h2>Reading</h2>
                             <div className="panel-content-description">
@@ -108,14 +107,14 @@ class Hobbies extends React.Component {
                 </Grid>
 
                 <Grid container css={[cssPanel, materialPanel, materialShadow]}>
-                    <Grid item xs={4} className="panel-image-wrapper">
+                    <Grid item xs={12} md={4} className="panel-image-wrapper">
                         <img src={HobbiesAnime} alt="Hobbies - Anime"
                             onLoad={(e) => this.onImageLoaded(2, e)} 
                             style={(this.state.arrayLoadedImages[2] ? {display: 'block'} : { display: 'none' })}/>
                         <Skeleton variant="rectangular" className="image-skeleton" 
                             style={(this.state.arrayLoadedImages[2] ? {display: 'none'} : { display: 'block' })}></Skeleton>
                     </Grid>
-                    <Grid item xs={8} container direction="column" className="panel-content-wrapper">
+                    <Grid item xs={12} md={8} container direction="column" className="panel-content-wrapper">
                         <Grid item xs={10}>
                             <h2>Anime and Manga</h2>
                             <div className="panel-content-description">
@@ -133,14 +132,14 @@ class Hobbies extends React.Component {
                 </Grid>
 
                 <Grid container css={[cssPanel, materialPanel, materialShadow]}>
-                    <Grid item xs={4} className="panel-image-wrapper">
+                    <Grid item xs={12} md={4} className="panel-image-wrapper">
                         <img src={HobbiesGames} alt="Hobbies - Games"
                             onLoad={(e) => this.onImageLoaded(3, e)} 
                             style={(this.state.arrayLoadedImages[3] ? {display: 'block'} : { display: 'none' })} />
                         <Skeleton variant="rectangular" className="image-skeleton" 
                             style={(this.state.arrayLoadedImages[3] ? {display: 'none'} : { display: 'block' })}></Skeleton>
                     </Grid>
-                    <Grid item xs={8} container direction="column" className="panel-content-wrapper">
+                    <Grid item xs={12} md={8} container direction="column" className="panel-content-wrapper">
                         <Grid item xs={10}>
                             <h2>Games</h2>
                             <div className="panel-content-description">

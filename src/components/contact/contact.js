@@ -7,6 +7,7 @@ import {
     materialTitle 
 } from './../../styles_shared/styles-shared.js';
 
+import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
@@ -25,11 +26,7 @@ import SocialMediaBackground from './../../assets/images/social-media.jpg';
 const cssContact = css({
     width: '95%',
     margin: '48px auto',
-    display: 'flex',
-    justifyContent: 'space-around',
-    alignItems: 'center',
     '> div:nth-of-type(1)': {
-        flexBasis: '35%',
         img: {
             display: 'block',
             width: '100%',
@@ -40,12 +37,10 @@ const cssContact = css({
         }
     },
     '> div:nth-of-type(2)': {
-        flexBasis: '40%'
     }
 });
 const cssSocialMediaBlurb = css({
     backgroundColor: '#FFFFFF',
-    minHeight: '400px',
     padding: '24px 48px',
     'h1': materialTitle,
     '> p': materialParagraph,
@@ -111,15 +106,15 @@ class Contact extends React.Component {
     render() {
         return (
         <div>
-            <div css={cssContact}>
-                <div>
+            <Grid container   justifyContent="space-around" css={cssContact}>
+                <Grid item xs={12} md={5}>
                     <img src={SocialMediaBackground} alt="Contact Background"
                         onLoad={(e) => this.onImageLoaded(0, e)} 
                         style={(this.state.arrayLoadedImages[0] ? {display: 'block'} : { display: 'none' })}></img>
                     <Skeleton variant="rectangular" className="image-skeleton" 
                             style={(this.state.arrayLoadedImages[0] ? {display: 'none'} : { display: 'block' })}></Skeleton>
-                </div>
-                <div css={[cssSocialMediaBlurb, materialShadow]}>
+                </Grid>
+                <Grid item xs={12} md={5} css={[cssSocialMediaBlurb, materialShadow]}>
                     <h1>Contact Me!</h1>
                     <p>Feel free to contact me via email or through any of the following social media platforms. I especially enjoy using Discord!</p>
                     <br/><br/><br/>
@@ -136,8 +131,8 @@ class Contact extends React.Component {
 
                     <div css={cssSocialMediaIconText}>
                         <div>
-                            <IconButton aria-label="LinkedIn">
-                                <LinkedInIcon onClick={this.openLinkedInLink}></LinkedInIcon>
+                            <IconButton aria-label="LinkedIn" onClick={this.openLinkedInLink}>
+                                <LinkedInIcon></LinkedInIcon>
                             </IconButton>
                         </div>
                         <Button variant="outlined" css={css({textTransform: 'none',})}
@@ -146,8 +141,8 @@ class Contact extends React.Component {
 
                     <div css={cssSocialMediaIconText}>
                         <div>
-                            <IconButton aria-label="Github">
-                                <GitHubIcon onClick={this.openGithubLink}></GitHubIcon>
+                            <IconButton aria-label="Github" onClick={this.openGithubLink}>
+                                <GitHubIcon></GitHubIcon>
                             </IconButton>
                         </div>
                         <Button variant="outlined" css={css({textTransform: 'none',})}
@@ -167,8 +162,8 @@ class Contact extends React.Component {
                         <span>Attribution: </span>
                         <a href="https://www.vecteezy.com/free-vector/web">Web Vectors by Vecteezy</a>
                     </div>
-                </div>
-            </div>
+                </Grid>
+            </Grid>
             <Snackbar
                 open={this.state.openSnackbar}
                 anchorOrigin={{vertical: 'bottom', horizontal:'right'}}

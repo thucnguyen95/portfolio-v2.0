@@ -6,7 +6,6 @@ import {
     materialShadow, 
     materialParagraph, 
     materialTitle, 
-    materialHeading,
     materialCard, 
     materialCarousel ,
     materialGridPaper
@@ -19,6 +18,9 @@ import Paper from '@mui/material/Paper';
 import Skeleton from '@mui/material/Skeleton';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 import AboutBackground from './../../assets/images/abstract-flat-background.jpg';
 import ProfilePicture from './../../assets/images/profile.jpg';
@@ -46,6 +48,9 @@ const cssBackground = css({
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
+        'h2, p': {
+            textAlign: 'center',
+        }
     },
     '> div:nth-of-type(2)': {
         position: 'absolute',
@@ -54,15 +59,14 @@ const cssBackground = css({
     }
 })
 const cssProfile = css({
-    display: 'flex',
     marginTop: '96px',
     marginBottom: '96px',
     'div:nth-of-type(1)': {
         flexBasis: '40%',
-        maxWidth: '640px',
         'img': {
             display: 'block',
             width: '60%',
+            maxWidth: '640px',
             margin: '0 auto',
         }
     },
@@ -191,30 +195,44 @@ class About extends React.Component {
             <div css={cssBackground}>
                 <img src={AboutBackground} alt="About background" />
                 <div>
-                    <h2 css={[materialTitle, {color: '#212121', fontSize: '2.5em', textAlign: 'center'}]}>Thuc Nguyen</h2>
-                    <p css={[materialHeading, {textAlign: 'center'}]}>Software Engineer</p>
+                    <Typography variant="h2" component="h2" sx={{color: '#212121', fontSize: { xs: '1.6rem', md: '3.0rem' } }}>
+                        Thuc Nguyen
+                    </Typography>
+                    <Typography variant="p" component="p" sx={{fontSize: { xs: '1.0rem', md: '1.6rem' }}}>
+                        Software Engineer
+                    </Typography>
                 </div>
                 <div>
-                    <a href="https://www.vecteezy.com/free-vector/abstract-background">Abstract Background Vectors by Vecteezy</a>
+                    <Typography variant="p" sx={{fontSize: { xs: '0.8rem', md: '1.0rem' }}}>
+                        <a href="https://www.vecteezy.com/free-vector/abstract-background">Abstract Background Vectors by Vecteezy</a>
+                    </Typography>
                 </div>
             </div>
             
             <div css={{width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
                 {/* Profile */}
-                <div css={cssProfile}>
-                    <div>
-                        <img src={ProfilePicture} alt="Profile"></img>
-                    </div>
-                    <div>
-                        <h2 css={materialTitle}>Welcome!</h2>
-                        <p>My name is Thuc (pronounced "Tuck") and this is an online portfolio of most of the projects I've completed throughout my career as a software engineer. This includes projects from undergrad, grad, internships, and work.</p>
-                        <br/>
-                        <p><b>A brief overview of my journey:</b></p>
-                        <p>I was a Human Biology major during undergrad at UCSD and became really interested in Computer Science during that time. Due to personal reasons, I didn't make the switch in majors and instead, self-taught myself the fundamentals. I decided to fully transition careers after undergrad and completed a Web and Mobile Applications Development certificate program at SDSU. Afterward, I attended UCI for the Master of Software Engineering program and had an amazing experience there!</p>
-                        <br/>
-                        <p>My most recent employment was at a genetics company called Fulgent Genetics, where I was a Solutions Software Engineer assisting the team in development and maintenance of their internal management system.</p>
-                    </div>
-                </div>
+                <Container maxWidth="xl">
+                    <Box  css={cssProfile} sx={{
+                        display: 'flex',
+                        flexDirection: {
+                            xs: 'column',
+                            md: 'row'
+                        }
+                    }}>
+                        <div>
+                            <img src={ProfilePicture} alt="Profile"></img>
+                        </div>
+                        <div>
+                            <h2 css={materialTitle}>Welcome!</h2>
+                            <p>My name is Thuc (pronounced "Tuck") and this is an online portfolio of most of the projects I've completed throughout my career as a software engineer. This includes projects from undergrad, grad, internships, and work.</p>
+                            <br/>
+                            <p><b>A brief overview of my journey:</b></p>
+                            <p>I was a Human Biology major during undergrad at UCSD and became really interested in Computer Science during that time. Due to personal reasons, I didn't make the switch in majors and instead, self-taught myself the fundamentals. I decided to fully transition careers after undergrad and completed a Web and Mobile Applications Development certificate program at SDSU. Afterward, I attended UCI for the Master of Software Engineering program and had an amazing experience there!</p>
+                            <br/>
+                            <p>My most recent employment was at a genetics company called Fulgent Genetics, where I was a Solutions Software Engineer assisting the team in development and maintenance of their internal management system.</p>
+                        </div>
+                    </Box>
+                </Container>
 
                 {/* Education */}
                 <h2 css={[materialTitle]}>Education</h2>
@@ -266,19 +284,22 @@ class About extends React.Component {
                     <div css={materialCarousel}>
                         <ArrowLeftIcon className="carousel-arrows"></ArrowLeftIcon>
                         <Grid container css={materialShadow} className="carousel-container">
-                            <Grid item xs={4} className="carousel-image-wrapper">
+                            <Grid item xs={12} md={4} className="carousel-image-wrapper" sx={{marginTop: { xs: '48px', md: '0' }}}>
                                 <img src={FulgentLogo} alt="Fulgent Genetics"/>
                             </Grid>
-                            <Grid item xs={8} className="carousel-content-wrapper">
+                            <Grid item xs={12} md={8} className="carousel-content-wrapper">
                                 <h2>Fulgent Genetics</h2>
-                                <div className="carousel-content-sub-wrapper">
-                                    <p className="carousel-content-subtitle">Solutions Software Engineer</p>
+                                <Box className="carousel-content-sub-wrapper" sx={{}}>
+                                    <p className="carousel-content-subtitle"><i>Solutions Software Engineer</i></p>
                                     <p className="carousel-content-date">Feb 2021 - Jun 2022</p>
-                                </div>
+                                </Box>
                                 <div className="carousel-content-description">
-                                    <p>Fulgent Genetics is a genomic testing company that focuses on providing sequencing and diagnostic testing results to patients and institutions. The services they offer include patient care and testing in oncology, pathology, infectious and rare diseases, and more.</p>
-                                    <br/>
-                                    <p>The team I worked under was called FLIMS, which was the primary management system, and my responsibilities were diverse: from fixing small bugs to designing and implementing an integration for a new product line or service.</p>
+                                    <Typography paragraph sx={{ fontSize: { xs: '0.9rem !important', md: '1.0rem !important' } }}>
+                                        Fulgent Genetics is a genomic testing company that focuses on providing sequencing and diagnostic testing results to patients and institutions. The services they offer include patient care and testing in oncology, pathology, infectious and rare diseases, and more.
+                                    </Typography>
+                                    <Typography paragraph sx={{ fontSize: { xs: '0.9rem !important', md: '1.0rem !important' } }}>
+                                        The team I worked under was called FLIMS, which was the primary management system, and my responsibilities were diverse: from fixing small bugs to designing and implementing an integration for a new product line or service.
+                                    </Typography>
                                 </div>
                                 <div className="carousel-content-actions">
                                     <Button onClick={(e) => this.openWebsiteLink('https://fulgentgenetics.com/', e)}>Company Website</Button>
@@ -327,19 +348,19 @@ class About extends React.Component {
                 <h2 css={[materialTitle]}>Skills</h2>
                 <div css={[cssSkills, materialShadow]}>
                     {Object.keys(SKILL).map((skillCategory) => 
-                        <div css={cssSkillsCard}>
+                        <Box key={'skillcategory-' + skillCategory} css={cssSkillsCard} sx={{flexDirection: { xs: 'column', md: 'row' } }}>
                             <div css={{padding: '24px 48px'}}>
                                 <p>{skillCategory}</p>
                             </div>
                             <div css={{padding: '24px 48px'}}>
                                 {Object.values(SKILL[skillCategory]).map((s) => 
-                                    <Chip label={s} variant="outlined" color={
+                                    <Chip key={'skill-' + s} label={s} variant="outlined" color={
                                         (skillCategory === 'LANGUAGES') ? "info" : 
                                         (skillCategory === 'FRAMEWORKS/LIBRARIES') ? "success" : 
                                         (skillCategory === 'OTHER') ? "secondary" : "primary"} css={{ margin: '2px 4px'}}/>
                                 )}
                             </div>
-                        </div>
+                        </Box>
                     )}
                 </div>
             </div>

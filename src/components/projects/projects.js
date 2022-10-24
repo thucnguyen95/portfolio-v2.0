@@ -9,10 +9,7 @@ import {
 
 import { css } from '@emotion/react';
 import { 
-    materialShadow,
-    materialParagraph, 
     materialTitle, 
-    materialSubtitle,
     materialGridPaper 
 } from './../../styles_shared/styles-shared.js';
 
@@ -22,14 +19,14 @@ import ListItem from '@mui/material/ListItem';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Skeleton from '@mui/material/Skeleton';
 import Fab from '@mui/material/Fab';
 import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import Chip from '@mui/material/Chip';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 
-import { BaseEntry } from './../../models/baseentry.js';
 import { ProjectEntry } from './../../models/projectentry.js';
 import { WorkEntry } from './../../models/workentry.js';
 import { FreelanceEntry } from './../../models/freelanceentry.js';
@@ -57,21 +54,14 @@ const cssProjects = css({
         flexGrow: 1,
     },
 });
+const cssProjectDefault = css({
+    padding: '12px 48px',
+    '@media (max-width: 600px)': {
+        padding: '12px',
+    }
+});
 const cssProjectChild = css({
 
-});
-const cssFloatingReturn = css({
-    position: 'fixed',
-    height: '40px',
-    left: '0',
-    bottom: '0',
-    backgroundColor: '#fff',
-    width: '100%',
-    textAlign: 'center',
-    fontSize: '22px',
-    boxShadow: '0px 4px 4px rgba(0,0,0,0.2)',
-    transition: 'top .3s',
-    zIndex:'10',
 });
 const cssFloatingActionButton = css({
     position: 'fixed',
@@ -90,6 +80,10 @@ const cssDrawer = css({
     '.MuiFormControlLabel-label': {
         fontSize: '0.9em',
     },
+    '@media (max-width: 600px)': {
+        display: 'none !important',
+        color: '#F00',
+    }
 });
 const cssDrawerTitle1 = css({
     color: '#616161', 
@@ -162,7 +156,6 @@ class Projects extends React.Component {
                 currentNavigateUrlChild: this.props.params['projectId']
             }));
         }
-        console.log('SCROLLING');
         window.scrollTo({top: 0, left: 0, behavior: 'smooth'});
 
         this.buildEntriesFromFileMap();
@@ -355,7 +348,6 @@ class Projects extends React.Component {
             const navigate = useNavigate();
           
             function handleClick() {
-                console.log(that.state);
                 that.setState((state, props) => ({
                     currentNavigateUrlChild: null
                 }));
@@ -386,7 +378,7 @@ class Projects extends React.Component {
         <div css={finalCssProjects} >
             {/* Drawer */}
             {!isDisplayingProjectChild &&
-                <div css={[cssDrawer]}>
+                <Box css={cssDrawer}>
                     <div css={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                         <h1 css={materialTitle}>Projects</h1>
                         <Button onClick={this.clearAllFilters}>Clear</Button>
@@ -424,19 +416,19 @@ class Projects extends React.Component {
                         ))}
                         </FormGroup>
                     </List>
-                </div>
+                </Box>
             }
 
             <div>
                 {/* Project default */}
                 {!isDisplayingProjectChild &&
-                    <div css={{padding: '12px 48px'}}>
+                    <div css={cssProjectDefault}>
                         {atLeastOneFilteredListWorkEntry &&
                             <h2 css={materialTitle}>Work</h2>
                         }
-                        <Grid container wrap="wrap" spacing={3} css={cssProjectsGrid}>
+                        <Grid container wrap="wrap" spacing={{ xs: 2, md: 3 }} css={cssProjectsGrid}>
                             {this.state.filteredListWorkEntries.map((entry, index) => (
-                                <Grid item xs={3} key={'grid-item-' + entry.getProjId()} css={{minWidth: '288px'}}>
+                                <Grid item xs={12} md={3} key={'grid-item-' + entry.getProjId()} css={{minWidth: '288px'}}>
                                     <Paper square css={materialGridPaper}>
                                         <div className="paper-image-wrapper">
                                             {entry.getBackgroundImage() &&
@@ -476,9 +468,9 @@ class Projects extends React.Component {
                         {atLeastOneFilteredListProjectEntry &&
                             <h2 css={materialTitle}>Projects</h2>
                         }
-                        <Grid container wrap="wrap" spacing={3} css={cssProjectsGrid}>
+                        <Grid container wrap="wrap" spacing={{ xs: 2, md: 3 }} css={cssProjectsGrid}>
                             {this.state.filteredListProjectEntries.map((entry, index) => (
-                                <Grid item xs={3} key={'grid-item-' + entry.getProjId()} css={{minWidth: '288px'}}>
+                                <Grid item xs={12} md={3} key={'grid-item-' + entry.getProjId()} css={{minWidth: '288px'}}>
                                     <Paper square css={materialGridPaper}>
                                         <div className="paper-image-wrapper">
                                             {entry.getBackgroundImage() &&
@@ -518,9 +510,9 @@ class Projects extends React.Component {
                         {atLeastOneFilteredListFreelanceEntry &&
                             <h2 css={materialTitle}>Freelance</h2>
                         }
-                        <Grid container wrap="wrap" spacing={3} css={cssProjectsGrid}>
+                        <Grid container wrap="wrap" spacing={{ xs: 2, md: 3 }} css={cssProjectsGrid}>
                             {this.state.filteredListFreelanceEntries.map((entry, index) => (
-                                <Grid item xs={3} key={'grid-item-' + entry.getProjId()} css={{minWidth: '288px'}}>
+                                <Grid item xs={12} md={3} key={'grid-item-' + entry.getProjId()} css={{minWidth: '288px'}}>
                                     <Paper square css={materialGridPaper}>
                                         <div className="paper-image-wrapper">
                                             {entry.getBackgroundImage() &&
