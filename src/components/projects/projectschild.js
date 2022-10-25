@@ -136,6 +136,7 @@ const projectContentBbc = css({
     },
     'pre': {
         backgroundColor: '#EFEFEF',
+        overflowX: 'auto',
     },
     '.mobile-image-wrapper-single': {
         width: '40%',
