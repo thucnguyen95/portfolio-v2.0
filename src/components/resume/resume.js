@@ -121,7 +121,7 @@ class Resume extends React.Component {
     render() {
         return (
         <div>
-            <Grid container wrap="wrap-reverse" css={cssDocument}>
+            <Grid container wrap="wrap-reverse" spacing={3} css={cssDocument}>
                 {/* <Document css={cssDocumentResume} file="resume.pdf" rotate={this.state.documentOrientations[this.state.documentOrientationIndex]} 
                     onLoadSuccess={this.onDocumentLoadSuccess}
                     loading={<Skeleton variant="rectangular" width={800} height={1070}/>}
@@ -129,7 +129,7 @@ class Resume extends React.Component {
                     <Page width="798" pageNumber={this.state.pageNumber} />
                 </Document> */}
                 <Grid item xs={12} md={8}>
-                    <object data={process.env.PUBLIC_URL + '/resume.pdf'} type="application/pdf" typemustmatch="true" width="800px" height="1070px">
+                    <object data={process.env.PUBLIC_URL + '/resume.pdf'} type="application/pdf" typemustmatch="true" width="100%" height="1070px">
                     <p>Your web browser doesn't have a PDF plugin. Instead you can click this button to download the pdf file:<span><Button onClick={this.onDocumentDownload}>Download</Button></span></p>
                     
                     </object>

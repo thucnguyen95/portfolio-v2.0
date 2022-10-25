@@ -11,7 +11,8 @@ import {
     Routes,
     Route,
     Link,
-    NavLink
+    NavLink,
+    Navigate
 } from 'react-router-dom';
 
 import AppBar from '@mui/material/AppBar';
@@ -164,6 +165,7 @@ class App extends React.Component {
                             <Route path="/hobbies" element={<Hobbies/>}></Route>
                             <Route path="/contact" element={<Contact/>}></Route>
                             <Route path="/" element={<About/>}></Route>
+                            <Route path="*" element={<Navigate to="/" />}></Route>
                         </Routes>
                     </div>
 
