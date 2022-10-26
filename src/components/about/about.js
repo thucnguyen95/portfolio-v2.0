@@ -289,7 +289,7 @@ class About extends React.Component {
                             </Grid>
                             <Grid item xs={12} md={8} className="carousel-content-wrapper">
                                 <h2>Fulgent Genetics</h2>
-                                <Box className="carousel-content-sub-wrapper" sx={{}}>
+                                <Box className="carousel-content-sub-wrapper" sx={{ flexDirection: { xs: 'column !important', md: 'row !important' } }}>
                                     <p className="carousel-content-subtitle"><i>Solutions Software Engineer</i></p>
                                     <p className="carousel-content-date">Feb 2021 - Jun 2022</p>
                                 </Box>

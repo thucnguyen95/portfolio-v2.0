@@ -41,8 +41,6 @@ export const materialNavLink = css({
 
 // Composed Units
 export const materialMenu = css({
-    // display: 'flex',
-    // justifyContent: 'start',
     '> div': { margin: '0px 12px' },
     'a': materialNavLink,
     'a.active': {
@@ -80,7 +78,7 @@ export const materialCard = css({
     },
     '.card-content-footer': {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         justifyContent: 'space-between',
     }
 });
@@ -103,14 +101,11 @@ export const materialCarousel = css({
         backgroundColor: '#FFFFFF',
         width: '85%',
         maxWidth: '3024px',
-        // maxHeight: '405px',
     },
     '.carousel-image-wrapper': {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        // border: '1px dashed red',
-        // margin: '12px 0px',
         img: {
             display: 'block',
             width: '80%',
@@ -119,7 +114,6 @@ export const materialCarousel = css({
             maxWidth: '1040px',
             maxHeight: '320px',
             objectFit: 'contain',
-            // margin: 'auto',
         }
     },
     '.carousel-content-wrapper': {
@@ -127,8 +121,9 @@ export const materialCarousel = css({
     },
     h2: materialTitle,
     '.carousel-content-sub-wrapper': {
-        // display: 'flex',
-        // justifyContent: 'space-between',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         margin: '8px 0px 24px',
     },
     '.carousel-content-subtitle': materialParagraph,
@@ -144,12 +139,10 @@ export const materialCarousel = css({
 });
 export const materialPanel = css({
     '.panel-image-wrapper': {
-        // maxHeight: '360px',
         img: {
             display: 'block',
             width: '100%',
             minWidth: '300px',
-            // maxWidth: '720px',
             height: '100%',
             objectFit: 'cover',
         },
